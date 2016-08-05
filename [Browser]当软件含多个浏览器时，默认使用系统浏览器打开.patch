@@ -1,0 +1,106 @@
+From 8e5097af9047fe47f5f2eeaa9257b07ceb0f2687 Mon Sep 17 00:00:00 2001
+From: liangjianqiu <liangjianqiu@hkzechin.com>
+Date: Wed, 9 Mar 2016 17:18:05 +0800
+Subject: [PATCH] =?UTF-8?q?[Azumi][Browser]=E5=BD=93=E8=BD=AF=E4=BB=B6?=
+ =?UTF-8?q?=E5=90=AB=E5=A4=9A=E4=B8=AA=E6=B5=8F=E8=A7=88=E5=99=A8=E6=97=B6?=
+ =?UTF-8?q?=EF=BC=8C=E9=BB=98=E8=AE=A4=E4=BD=BF=E7=94=A8=E7=B3=BB=E7=BB=9F?=
+ =?UTF-8?q?=E6=B5=8F=E8=A7=88=E5=99=A8=E6=89=93=E5=BC=80?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../android/server/pm/PackageManagerService.java   | 67 ++++++++++++++++++++++
+ 1 file changed, 67 insertions(+)
+ mode change 100644 => 100755 alps/frameworks/base/services/core/java/com/android/server/pm/PackageManagerService.java
+
+diff --git a/alps/frameworks/base/services/core/java/com/android/server/pm/PackageManagerService.java b/alps/frameworks/base/services/core/java/com/android/server/pm/PackageManagerService.java
+old mode 100644
+new mode 100755
+index c36955a..85d66aa
+--- a/alps/frameworks/base/services/core/java/com/android/server/pm/PackageManagerService.java
++++ b/alps/frameworks/base/services/core/java/com/android/server/pm/PackageManagerService.java
+@@ -2625,6 +2625,8 @@ public class PackageManagerService extends IPackageManager.Stub {
+ 
+         // Expose private service for system components to use.
+         LocalServices.addService(PackageManagerInternal.class, new PackageManagerInternalImpl());
++        
++        setDefaultBrowser();//Moka add for default browser
+     }
+ 
+     @Override
+@@ -14250,6 +14252,71 @@ public class PackageManagerService extends IPackageManager.Stub {
+         return Build.VERSION_CODES.CUR_DEVELOPMENT;
+     }
+ 
++  /*
++    * Moka add for default browser setting
++    */
++       public void addPreferredActivity2(IntentFilter filter, int match,
++                ComponentName[] set, ComponentName activity) {
++        Log.d("debug_default","addPreferredActivity2 is called.");
++        // writer
++        synchronized (mPackages) {
++            Slog.i(TAG, "Adding preferred activity " + activity + ":");
++            filter.dump(new LogPrinter(Log.INFO, TAG), "  ");
++           mSettings.editPreferredActivitiesLPw(0).addFilter(
++                    new PreferredActivity(filter, match, set, activity,true));
++            mSettings.writePackageRestrictionsLPr(0);
++        }
++    }
++     private final void setDefaultBrowser(){
++           Log.d("debug_default","setDefaultBrowser is called.");
++           if(!isFirstBoot()) {
++               Log.d("debug_default","not first boot, return");
++               return;
++           }
++           String str1 = "android.intent.category.DEFAULT";
++           String str2 = "android.intent.category.BROWSABLE";
++           String str3 = "android.intent.action.VIEW";
++           //intent filter
++           IntentFilter filter = new IntentFilter(str3);
++           filter.addCategory(str1);
++           filter.addCategory(str2);
++           filter.addDataScheme("http");
++           //intent
++           Intent intent = new Intent(str3);
++           intent.addCategory(str2);
++           intent.addCategory(str1);
++           Uri uri = Uri.parse("http://");
++           intent.setDataAndType(uri, null);
++           //set System Browser as default browser,if your want set other browser as default, modify below code, add package name and activiy name
++           ComponentName component = new ComponentName("com.android.browser","com.android.browser.BrowserActivity");
++           //find all browsers
++           List<ResolveInfo> resolveInfoList = queryIntentActivities(intent,intent.getType(),PackageManager.GET_INTENT_FILTERS, 0);
++           int size = resolveInfoList.size();
++           ComponentName[] arrayOfComponentName = new ComponentName[size];
++           //make sure the default browser in phone
++           boolean no_UC = true;
++           for (int i = 0; i < size; i++)
++           {
++               ActivityInfo activityInfo = resolveInfoList.get(i).activityInfo;
++               String packageName = activityInfo.packageName;
++               String className = activityInfo.name;
++               //if your want set other browser as default, modify below package name
++               if (packageName.equals("com.android.browser")) no_UC = false;
++               ComponentName componentName = new ComponentName(packageName, className);
++                arrayOfComponentName[i] = componentName;
++           }
++           if (no_UC){
++               Log.d("debug_default","no uc package");
++               return;
++           }else{
++               Log.d("debug_default","uc package is in, set it as Preferred.");
++           }
++           //set default
++           addPreferredActivity2(filter,IntentFilter.MATCH_CATEGORY_SCHEME, arrayOfComponentName,component);
++           Log.d("debug_default","add UC to PreferredActivity");
++    }
++    //Moka  add for default browser setting end
++
+     @Override
+     public void addPreferredActivity(IntentFilter filter, int match,
+             ComponentName[] set, ComponentName activity, int userId) {
+-- 
+2.3.7
+

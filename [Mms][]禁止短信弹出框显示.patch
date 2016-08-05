@@ -1,0 +1,54 @@
+From beb13150928b31a5d30128eb12449ca2ae5f14bc Mon Sep 17 00:00:00 2001
+From: liangjianqiu <liangjianqiu@hkzechin.com>
+Date: Wed, 23 Mar 2016 14:37:35 +0800
+Subject: [PATCH] =?UTF-8?q?[Azumi][Mms][]=E7=A6=81=E6=AD=A2=E7=9F=AD?=
+ =?UTF-8?q?=E4=BF=A1=E5=BC=B9=E5=87=BA=E6=A1=86=E6=98=BE=E7=A4=BA?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../packages/apps/Mms/res/xml/notificationpreferences.xml           | 2 +-
+ .../src/com/mediatek/setting/NotificationPreferenceActivity.java    | 6 ++++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/notificationpreferences.xml b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/notificationpreferences.xml
+index 7133e79..b56f4c9 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/notificationpreferences.xml
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/notificationpreferences.xml
+@@ -32,7 +32,7 @@
+             android:dependency="pref_key_enable_notifications" android:title="@string/pref_vibrate"
+             android:summary="@string/pref_summary_vibrate" />
+         <CheckBoxPreference android:layout="?android:attr/preferenceLayoutChild"
+-            android:defaultValue="true" android:key="pref_key_popup_notification"
++            android:defaultValue="false" android:key="pref_key_popup_notification"
+             android:dependency="pref_key_enable_notifications" android:title="@string/pref_popup_notification"
+             android:summary="@string/pref_summary_popup_notification" />
+     </PreferenceCategory>
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/setting/NotificationPreferenceActivity.java b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/setting/NotificationPreferenceActivity.java
+index e1a3aea..3815eca 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/setting/NotificationPreferenceActivity.java
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/setting/NotificationPreferenceActivity.java
+@@ -228,7 +228,8 @@ public class NotificationPreferenceActivity extends PreferenceActivity
+         editor.putString(NOTIFICATION_MUTE, "0");
+         editor.putString(NOTIFICATION_RINGTONE, DEFAULT_RINGTONE);
+         editor.putBoolean(NOTIFICATION_VIBRATE, true);
+-        editor.putBoolean(POPUP_NOTIFICATION, true);
++        //editor.putBoolean(POPUP_NOTIFICATION, true);
++        editor.putBoolean(POPUP_NOTIFICATION, false);
+         editor.apply();
+         setPreferenceScreen(null);
+         setMessagePreferences();
+@@ -301,7 +302,8 @@ public class NotificationPreferenceActivity extends PreferenceActivity
+         }
+         SharedPreferences prefs
+                 = PreferenceManager.getDefaultSharedPreferences(MmsApp.getApplication());
+-        boolean enable = prefs.getBoolean(NotificationPreferenceActivity.POPUP_NOTIFICATION, true);
++        //boolean enable = prefs.getBoolean(NotificationPreferenceActivity.POPUP_NOTIFICATION, true);
++        boolean enable = prefs.getBoolean(NotificationPreferenceActivity.POPUP_NOTIFICATION, false);
+         return enable;
+     }
+ 
+-- 
+2.3.7
+

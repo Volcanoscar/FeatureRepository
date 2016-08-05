@@ -1,0 +1,49 @@
+From dc2e032bf8a70f4c26e70f2b465a8512f146262c Mon Sep 17 00:00:00 2001
+From: moduanke <moduanke@hkzechin.com>
+Date: Tue, 1 Mar 2016 17:29:27 +0800
+Subject: [PATCH] =?UTF-8?q?[Azumi][EngineerMode]Azumi=20CL=E9=A1=B9?=
+ =?UTF-8?q?=E7=9B=AE=E6=8C=89*#*#29864#*#*=E8=BF=9B=E5=B7=A5=E7=A8=8B?=
+ =?UTF-8?q?=E6=A8=A1=E5=BC=8F?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../proprietary/packages/apps/EngineerMode/AndroidManifest.xml        | 4 ++--
+ .../src/com/mediatek/engineermode/EngineerModeReceiver.java           | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/EngineerMode/AndroidManifest.xml b/alps/vendor/mediatek/proprietary/packages/apps/EngineerMode/AndroidManifest.xml
+index adba429..8129839 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/EngineerMode/AndroidManifest.xml
++++ b/alps/vendor/mediatek/proprietary/packages/apps/EngineerMode/AndroidManifest.xml
+@@ -704,9 +704,9 @@
+             android:exported="true" >
+             <intent-filter>
+                 <action android:name="android.provider.Telephony.SECRET_CODE" />
+-
++                <!--android:host="3646633" --> 
+                 <data
+-                    android:host="3646633"
++                    android:host="29864"
+                     android:scheme="android_secret_code" />
+             </intent-filter>
+         </receiver>
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/EngineerMode/src/com/mediatek/engineermode/EngineerModeReceiver.java b/alps/vendor/mediatek/proprietary/packages/apps/EngineerMode/src/com/mediatek/engineermode/EngineerModeReceiver.java
+index fc484d8..764a279 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/EngineerMode/src/com/mediatek/engineermode/EngineerModeReceiver.java
++++ b/alps/vendor/mediatek/proprietary/packages/apps/EngineerMode/src/com/mediatek/engineermode/EngineerModeReceiver.java
+@@ -47,8 +47,8 @@ public final class EngineerModeReceiver extends BroadcastReceiver {
+     private static final String TAG = "EM/SECRET_CODE";
+     private static final String SECRET_CODE_ACTION = "android.provider.Telephony.SECRET_CODE";
+     // process *#*#3646633#*#*
+-    private final Uri mEmUri = Uri.parse("android_secret_code://3646633");
+-
++    //private final Uri mEmUri = Uri.parse("android_secret_code://3646633");
++    private final Uri mEmUri = Uri.parse("android_secret_code://29864");
+     @Override
+     public void onReceive(Context context, Intent intent) {
+         if (intent.getAction() == null) {
+-- 
+2.3.7
+

@@ -1,0 +1,86 @@
+From 8116ecf7e96fed42baaf02f296efbb4d493a5b38 Mon Sep 17 00:00:00 2001
+From: moduanke <moduanke@hkzechin.com>
+Date: Tue, 26 Apr 2016 09:42:02 +0800
+Subject: [PATCH] =?UTF-8?q?[Azumi][Launcher3]=E4=BF=AE=E6=94=B9=E4=B8=BB?=
+ =?UTF-8?q?=E8=8F=9C=E5=8D=95=E8=83=8C=E6=99=AF=E9=80=8F=E6=98=8E?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../apps/Launcher3/res/drawable/quantum_panel_shape.xml       |  5 +++--
+ .../apps/Launcher3/src/com/android/launcher3/Launcher.java    | 11 +++++++++--
+ .../android/launcher3/LauncherStateTransitionAnimation.java   |  2 ++
+ .../com/android/launcher3/allapps/AllAppsContainerView.java   |  3 ---
+ 4 files changed, 14 insertions(+), 7 deletions(-)
+
+diff --git a/alps/packages/apps/Launcher3/res/drawable/quantum_panel_shape.xml b/alps/packages/apps/Launcher3/res/drawable/quantum_panel_shape.xml
+index 1083615..b27e25c 100755
+--- a/alps/packages/apps/Launcher3/res/drawable/quantum_panel_shape.xml
++++ b/alps/packages/apps/Launcher3/res/drawable/quantum_panel_shape.xml
+@@ -16,7 +16,8 @@
+ -->
+ <shape xmlns:android="http://schemas.android.com/apk/res/android"
+        android:shape="rectangle">
+-    <solid android:color="@color/quantum_panel_bg_color" />
++    <!--<solid android:color="@color/quantum_panel_bg_color" />-->
++    <solid android:color="@android:color/transparent"/>
+     <corners
+         android:radius="2dp" />
+-</shape>
+\ No newline at end of file
++</shape>
+diff --git a/alps/packages/apps/Launcher3/src/com/android/launcher3/Launcher.java b/alps/packages/apps/Launcher3/src/com/android/launcher3/Launcher.java
+index 0324a63..862d96b 100755
+--- a/alps/packages/apps/Launcher3/src/com/android/launcher3/Launcher.java
++++ b/alps/packages/apps/Launcher3/src/com/android/launcher3/Launcher.java
+@@ -1286,8 +1286,15 @@ public class Launcher extends Activity
+             // Don't update the predicted apps if the user is returning to launcher in the apps
+             // view after launching an app, as they may be depending on the UI to be static to
+             // switch to another app, otherwise, if it was
+-            showAppsView(false /* animated */, false /* resetListToTop */,
+-                    !launchedFromApp /* updatePredictedApps */, false /* focusSearchBar */);
++            //showAppsView(false /* animated */, false /* resetListToTop */,
++              //      !launchedFromApp /* updatePredictedApps */, false /* focusSearchBar */);
++
++            mWorkspace.setVisibility(View.INVISIBLE); //mtk add
++            mPageIndicators.setAlpha(0f);    //mtk add
++ 
++            showAppsView(true /* animated */, true /* resetListToTop */,
++                    !launchedFromApp /* updatePredictedApps */, false /* focusSearchBar */);     // mtk modify
++
+         } else if (mOnResumeState == State.WIDGETS) {
+             showWidgetsView(false, false);
+         }
+diff --git a/alps/packages/apps/Launcher3/src/com/android/launcher3/LauncherStateTransitionAnimation.java b/alps/packages/apps/Launcher3/src/com/android/launcher3/LauncherStateTransitionAnimation.java
+index cdde8c1..b3ed187 100755
+--- a/alps/packages/apps/Launcher3/src/com/android/launcher3/LauncherStateTransitionAnimation.java
++++ b/alps/packages/apps/Launcher3/src/com/android/launcher3/LauncherStateTransitionAnimation.java
+@@ -139,6 +139,8 @@ public class LauncherStateTransitionAnimation {
+                     }
+                     public void onAnimationEnd(Animator animation) {
+                         allAppsButtonView.setVisibility(View.VISIBLE);
++                        Workspace workspace= mLauncher.getWorkspace();//mtk add
++                        workspace.setVisibility(View.INVISIBLE);//mtk add
+                     }
+                 };
+             }
+diff --git a/alps/packages/apps/Launcher3/src/com/android/launcher3/allapps/AllAppsContainerView.java b/alps/packages/apps/Launcher3/src/com/android/launcher3/allapps/AllAppsContainerView.java
+index e2dd084..28747ea 100755
+--- a/alps/packages/apps/Launcher3/src/com/android/launcher3/allapps/AllAppsContainerView.java
++++ b/alps/packages/apps/Launcher3/src/com/android/launcher3/allapps/AllAppsContainerView.java
+@@ -376,11 +376,8 @@ public class AllAppsContainerView extends BaseContainerView implements DragSourc
+                 padding.right, 0);
+         Rect bgPadding = new Rect();
+         background.getPadding(bgPadding);
+-	  //jianqiu del 20160215
+         mContainerView.setBackground(background);
+         mRevealView.setBackground(background.getConstantState().newDrawable());
+-	 mContainerView.getBackground().setAlpha(0);
+-	 mRevealView.getBackground().setAlpha(0);
+         mAppsRecyclerView.updateBackgroundPadding(bgPadding);
+         mAdapter.updateBackgroundPadding(bgPadding);
+ 
+-- 
+2.3.7
+

@@ -1,0 +1,45 @@
+From 7562dc0d781ec722b16f354b9294606719007132 Mon Sep 17 00:00:00 2001
+From: liubinyang <liubinyang@hkzechin.com>
+Date: Tue, 8 Mar 2016 11:00:01 +0800
+Subject: [PATCH] =?UTF-8?q?[Azumi][Camera]=E4=BF=AE=E6=94=B9=E9=BB=98?=
+ =?UTF-8?q?=E8=AE=A4PreviewSize=E4=B8=BA4:3?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../apps/Camera/src/com/android/camera/bridge/CameraDeviceExt.java     | 3 ++-
+ .../apps/Camera/src/com/mediatek/camera/setting/SettingUtils.java      | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Camera/src/com/android/camera/bridge/CameraDeviceExt.java b/alps/vendor/mediatek/proprietary/packages/apps/Camera/src/com/android/camera/bridge/CameraDeviceExt.java
+index 8c3c123..a1e10af 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Camera/src/com/android/camera/bridge/CameraDeviceExt.java
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Camera/src/com/android/camera/bridge/CameraDeviceExt.java
+@@ -185,7 +185,8 @@ public class CameraDeviceExt implements ICameraDeviceExt {
+                     mParametersExt);
+             if (supportedRatios != null && supportedRatios.size() > 0) {
+                 SharedPreferences.Editor editor = mPreferences.edit();
+-                String ratioString = supportedRatios.get(supportedRatios.size() - 1);
++                //String ratioString = supportedRatios.get(supportedRatios.size() - 1);
++		String ratioString = supportedRatios.get(0); //@darren modify for camera default 4:3
+       editor.putString(SettingConstants.KEY_PICTURE_RATIO, ratioString);
+                 editor.apply();
+                 pictureRatio = ratioString;
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Camera/src/com/mediatek/camera/setting/SettingUtils.java b/alps/vendor/mediatek/proprietary/packages/apps/Camera/src/com/mediatek/camera/setting/SettingUtils.java
+index 0fbb09f..20f00f7 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Camera/src/com/mediatek/camera/setting/SettingUtils.java
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Camera/src/com/mediatek/camera/setting/SettingUtils.java
+@@ -257,7 +257,8 @@ public class SettingUtils {
+         String ratioString = null;
+         if (supportedRatios != null && supportedRatios.size() > 0) {
+             SharedPreferences.Editor editor = sharedPreferences.edit();
+-            ratioString = supportedRatios.get(supportedRatios.size() - 1);
++            //ratioString = supportedRatios.get(supportedRatios.size() - 1);
++            ratioString = supportedRatios.get(0);//@darrem modify for camera default 4:3
+             editor.putString(SettingConstants.KEY_PICTURE_RATIO, ratioString);
+             editor.apply();
+         }
+-- 
+2.3.7
+

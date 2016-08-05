@@ -1,0 +1,74 @@
+From 725aeacb260e70e063e28dcd2e1534784ce95884 Mon Sep 17 00:00:00 2001
+From: liubinyang <liubinyang@hkzechin.com>
+Date: Fri, 18 Mar 2016 14:24:36 +0800
+Subject: [PATCH] =?UTF-8?q?[Azumi][=E6=9D=A5=E7=94=B5=E5=BD=92=E5=B1=9E?=
+ =?UTF-8?q?=E5=9C=B0][FAQ09200]=E5=8E=BB=E6=8E=89=E6=9D=A5=E7=94=B5?=
+ =?UTF-8?q?=E5=BD=92=E5=B1=9E=E5=9C=B0=E5=8A=9F=E8=83=BD?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../java/com/android/internal/telephony/CallerInfo.java          | 3 ++-
+ .../apps/InCallUI/src/com/android/incallui/CallerInfo.java       | 3 ++-
+ .../providers/contacts/DefaultCallLogInsertionHelper.java        | 9 ++++++---
+ 3 files changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/alps/frameworks/base/telephony/java/com/android/internal/telephony/CallerInfo.java b/alps/frameworks/base/telephony/java/com/android/internal/telephony/CallerInfo.java
+index b3ae981..23cc09f 100644
+--- a/alps/frameworks/base/telephony/java/com/android/internal/telephony/CallerInfo.java
++++ b/alps/frameworks/base/telephony/java/com/android/internal/telephony/CallerInfo.java
+@@ -622,7 +622,8 @@ public class CallerInfo {
+      */
+     public void updateGeoDescription(Context context, String fallbackNumber) {
+         String number = TextUtils.isEmpty(phoneNumber) ? fallbackNumber : phoneNumber;
+-        geoDescription = getGeoDescription(context, number);
++        //geoDescription = getGeoDescription(context, number);i
++	geoDescription = null;//@darren modify for rm NUMBER_GEODESCRIPTION
+     }
+ 
+     /**
+diff --git a/alps/packages/apps/InCallUI/src/com/android/incallui/CallerInfo.java b/alps/packages/apps/InCallUI/src/com/android/incallui/CallerInfo.java
+index 26bafa6..37a5344 100644
+--- a/alps/packages/apps/InCallUI/src/com/android/incallui/CallerInfo.java
++++ b/alps/packages/apps/InCallUI/src/com/android/incallui/CallerInfo.java
+@@ -496,7 +496,8 @@ public class CallerInfo {
+     */
+     public void updateGeoDescription(Context context, String fallbackNumber, int subId) {
+         String number = TextUtils.isEmpty(phoneNumber) ? fallbackNumber : phoneNumber;
+-        geoDescription = getGeoDescription(context, number, subId);
++        //geoDescription = getGeoDescription(context, number, subId);
++ 	geoDescription = null;//@darren modify for rm GeoDescription
+     }
+ 
+     /**
+diff --git a/alps/packages/providers/ContactsProvider/src/com/android/providers/contacts/DefaultCallLogInsertionHelper.java b/alps/packages/providers/ContactsProvider/src/com/android/providers/contacts/DefaultCallLogInsertionHelper.java
+index e784d1e..c235724 100644
+--- a/alps/packages/providers/ContactsProvider/src/com/android/providers/contacts/DefaultCallLogInsertionHelper.java
++++ b/alps/packages/providers/ContactsProvider/src/com/android/providers/contacts/DefaultCallLogInsertionHelper.java
+@@ -140,7 +140,8 @@ import java.util.Set;
+             String cityName = geoCodingQuery.queryByNumber(number);
+             Log.d(TAG, "[GeoCodingQuery] cityName = " + cityName);
+             if (!TextUtils.isEmpty(cityName)) {
+-                return cityName;
++                //return cityName;
++		return null;//@darren modify for rm GeocodedLocation cityname
+             }
+         }
+         /// @}
+@@ -151,8 +152,10 @@ import java.util.Set;
+             return getPhoneNumberOfflineGeocoder().getDescriptionForNumber(
+                     structuredPhoneNumber, mLocale);
+              */
+-            return getPhoneNumberOfflineGeocoder().getDescriptionForNumber(
+-                    structuredPhoneNumber, mContext.getResources().getConfiguration().locale);
++            /*return getPhoneNumberOfflineGeocoder().getDescriptionForNumber(
++                    structuredPhoneNumber, mContext.getResources().getConfiguration().locale);*/
++	    //@darren modify for rm GeoDescription
++	    return null;
+         } else {
+             return null;
+         }
+-- 
+2.3.7
+

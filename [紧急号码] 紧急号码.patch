@@ -1,0 +1,51 @@
+From 0f988bb10b0aba57f150f2e6aab1ff2920ce2603 Mon Sep 17 00:00:00 2001
+From: moduanke <moduanke@hkzechin.com>
+Date: Thu, 3 Mar 2016 15:28:55 +0800
+Subject: [PATCH] =?UTF-8?q?[Azumi][CL][=E7=B4=A7=E6=80=A5=E5=8F=B7?=
+ =?UTF-8?q?=E7=A0=81]=E6=9B=B4=E6=96=B0Azumi=20CL=20=E7=B4=A7=E6=80=A5?=
+ =?UTF-8?q?=E5=8F=B7=E7=A0=81?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../mediatek/proprietary/external/EccList/ecc_list.xml | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/alps/vendor/mediatek/proprietary/external/EccList/ecc_list.xml b/alps/vendor/mediatek/proprietary/external/EccList/ecc_list.xml
+index 04cb3c7..1d43dfb 100755
+--- a/alps/vendor/mediatek/proprietary/external/EccList/ecc_list.xml
++++ b/alps/vendor/mediatek/proprietary/external/EccList/ecc_list.xml
+@@ -9,6 +9,7 @@
+             - 1: ecc always
+             - 2: MMI will show ecc but send to nw as normal call
+     -->
++    <!--
+     <EccEntry Ecc="112" Category="0" Condition="1" />
+     <EccEntry Ecc="911" Category="0" Condition="1" />
+     <EccEntry Ecc="000" Category="0" Condition="0" />
+@@ -16,5 +17,20 @@
+     <EccEntry Ecc="110" Category="0" Condition="0" />
+     <EccEntry Ecc="118" Category="0" Condition="0" />
+     <EccEntry Ecc="119" Category="0" Condition="0" />
+-    <EccEntry Ecc="999" Category="0" Condition="0" />
++    <EccEntry Ecc="999" Category="0" Condition="0" />-->
++    <!--Moka add sos number for Azumi CL -->
++       <EccEntry Ecc="112" Category="0" Condition="1" />
++       <EccEntry Ecc="911" Category="0" Condition="1" />
++       <EccEntry Ecc="000" Category="0" Condition="1" />
++       <EccEntry Ecc="08" Category="0" Condition="1" />
++       <EccEntry Ecc="110" Category="0" Condition="1" />
++       <EccEntry Ecc="118" Category="0" Condition="1" />
++       <EccEntry Ecc="119" Category="0" Condition="1" />
++       <EccEntry Ecc="130" Category="0" Condition="1" />
++       <EccEntry Ecc="131" Category="0" Condition="1" />
++       <EccEntry Ecc="132" Category="0" Condition="1" />
++       <EccEntry Ecc="133" Category="0" Condition="1" />
++       <EccEntry Ecc="137" Category="0" Condition="1" />
++       <EccEntry Ecc="139" Category="0" Condition="1" />
++       <EccEntry Ecc="999" Category="0" Condition="1" />
+ </EccTable>
+-- 
+2.3.7
+

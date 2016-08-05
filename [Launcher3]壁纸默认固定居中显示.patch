@@ -1,0 +1,52 @@
+From 41f69fae6de4e78effe0910d6d69d14dc6e20dd1 Mon Sep 17 00:00:00 2001
+From: moduanke <moduanke@hkzechin.com>
+Date: Thu, 3 Mar 2016 15:55:26 +0800
+Subject: [PATCH] =?UTF-8?q?[Azumi][Launcher3]=E5=A3=81=E7=BA=B8=E9=BB=98?=
+ =?UTF-8?q?=E8=AE=A4=E5=9B=BA=E5=AE=9A=E5=B1=85=E4=B8=AD=E6=98=BE=E7=A4=BA?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../apps/Launcher3/src/com/android/launcher3/Workspace.java      | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/alps/packages/apps/Launcher3/src/com/android/launcher3/Workspace.java b/alps/packages/apps/Launcher3/src/com/android/launcher3/Workspace.java
+index 05b435f..46c6293 100755
+--- a/alps/packages/apps/Launcher3/src/com/android/launcher3/Workspace.java
++++ b/alps/packages/apps/Launcher3/src/com/android/launcher3/Workspace.java
+@@ -1436,7 +1436,7 @@ public class Workspace extends PagedView
+         // Don't use all the wallpaper for parallax until you have at least this many pages
+         private final int MIN_PARALLAX_PAGE_SPAN = 3;
+         int mNumScreens;
+-
++        private  boolean fixWallpaper = true; //jianqiu add 20150615
+         public WallpaperOffsetInterpolator() {
+             mChoreographer = Choreographer.getInstance();
+             mInterpolator = new DecelerateInterpolator(1.5f);
+@@ -1452,8 +1452,13 @@ public class Workspace extends PagedView
+                 mWaitingForUpdate = false;
+                 if (computeScrollOffset() && mWindowToken != null) {
+                     try {
++			if(fixWallpaper){
+                         mWallpaperManager.setWallpaperOffsets(mWindowToken,
++			0.5f, 0.5f);
++				}else{
++			mWallpaperManager.setWallpaperOffsets(mWindowToken,
+                                 mWallpaperOffset.getCurrX(), 0.5f);
++			}
+                         setWallpaperOffsetSteps();
+                     } catch (IllegalArgumentException e) {
+                         Log.e(TAG, "Error updating wallpaper offset: " + e);
+@@ -1497,7 +1502,7 @@ public class Workspace extends PagedView
+             }
+             mNumPagesForWallpaperParallax = parallaxPageSpan;
+ 
+-            if (getChildCount() <= 1) {
++            if (getChildCount() <= 1 || fixWallpaper) {
+                 if (mIsRtl) {
+                     return 1 - 1.0f/mNumPagesForWallpaperParallax;
+                 }
+-- 
+2.3.7
+

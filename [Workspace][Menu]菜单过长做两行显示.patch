@@ -1,0 +1,30 @@
+From f29988397a9d53f40fb610d28d175a10525e2d80 Mon Sep 17 00:00:00 2001
+From: moduanke <moduanke@hkzechin.com>
+Date: Fri, 4 Mar 2016 15:37:09 +0800
+Subject: [PATCH] =?UTF-8?q?[Azumi][Workspace][Menu]=E8=8F=9C=E5=8D=95?=
+ =?UTF-8?q?=E8=BF=87=E9=95=BF=E5=81=9A=E4=B8=A4=E8=A1=8C=E6=98=BE=E7=A4=BA?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ alps/packages/apps/Launcher3/res/values/styles.xml | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/alps/packages/apps/Launcher3/res/values/styles.xml b/alps/packages/apps/Launcher3/res/values/styles.xml
+index 7d60cbe..27c321d 100755
+--- a/alps/packages/apps/Launcher3/res/values/styles.xml
++++ b/alps/packages/apps/Launcher3/res/values/styles.xml
+@@ -31,7 +31,8 @@
+         <item name="android:layout_height">match_parent</item>
+         <item name="android:layout_gravity">center</item>
+         <item name="android:gravity">center_horizontal</item>
+-        <item name="android:singleLine">true</item>
++        <item name="android:singleLine">false</item>
++        <item name="android:maxLines">2</item>
+         <item name="android:ellipsize">marquee</item>
+         <item name="android:textColor">@color/workspace_icon_text_color</item>
+         <item name="android:shadowRadius">2.0</item>
+-- 
+2.3.7
+

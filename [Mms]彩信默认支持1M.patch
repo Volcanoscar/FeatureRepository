@@ -1,0 +1,221 @@
+From e8e34964f061deb08fca893d79c0ca31bb49fd26 Mon Sep 17 00:00:00 2001
+From: liangjianqiu <liangjianqiu@hkzechin.com>
+Date: Mon, 21 Mar 2016 17:28:56 +0800
+Subject: [PATCH] =?UTF-8?q?[Azumi][Mms]=E5=BD=A9=E4=BF=A1=E9=BB=98?=
+ =?UTF-8?q?=E8=AE=A4=E6=94=AF=E6=8C=811M?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../Mms/ext/src/com/mediatek/mms/ext/DefaultOpMmsConfigExt.java  | 3 ++-
+ .../proprietary/packages/apps/Mms/res/values/mtk_arrays.xml      | 4 ++--
+ .../proprietary/packages/apps/Mms/res/xml/mms_config.xml         | 2 +-
+ .../proprietary/packages/apps/Mms/res/xml/mmspreferences.xml     | 2 +-
+ .../packages/apps/Mms/res/xml/multicardpreferences.xml           | 2 +-
+ .../proprietary/packages/apps/Mms/res/xml/preferences.xml        | 2 +-
+ .../packages/apps/Mms/src/com/android/mms/MmsConfig.java         | 4 ++--
+ .../apps/Mms/src/com/android/mms/ui/ComposeMessageActivity.java  | 4 ++++
+ .../packages/apps/Mms/src/com/android/mms/ui/MessageUtils.java   | 9 ++++++---
+ .../apps/Mms/src/com/mediatek/setting/MmsPreferenceActivity.java | 7 ++++---
+ 10 files changed, 24 insertions(+), 15 deletions(-)
+ mode change 100644 => 100755 alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/mms_config.xml
+ mode change 100644 => 100755 alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/preferences.xml
+ mode change 100644 => 100755 alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/MessageUtils.java
+
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/ext/src/com/mediatek/mms/ext/DefaultOpMmsConfigExt.java b/alps/vendor/mediatek/proprietary/packages/apps/Mms/ext/src/com/mediatek/mms/ext/DefaultOpMmsConfigExt.java
+index 30a8db5..1b15304 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/ext/src/com/mediatek/mms/ext/DefaultOpMmsConfigExt.java
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/ext/src/com/mediatek/mms/ext/DefaultOpMmsConfigExt.java
+@@ -69,7 +69,8 @@ public class DefaultOpMmsConfigExt implements IOpMmsConfigExt {
+     private static int sMaxTextLimit = 2048;
+     private static int sMmsRecipientLimit = 20;                 // default value
+ /// M:Code analyze 01,For new feature CMCC_Mms in ALPS00325381, MMS easy porting check in JB @{
+-    private static int sHttpSocketTimeout = 60 * 1000;
++    //private static int sHttpSocketTimeout = 60 * 1000;
++    private static int sHttpSocketTimeout = 90 * 1000; //jianqiu modify 20160321
+ /// @}
+     /// M: For common case, default retry scheme not change
+     private static final int[] DEFAULTRETRYSCHEME = {
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values/mtk_arrays.xml b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values/mtk_arrays.xml
+index da3f0dc..5385004 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values/mtk_arrays.xml
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values/mtk_arrays.xml
+@@ -43,12 +43,12 @@
+     <string-array name="pref_mms_size_limit_choices" translatable="false">
+         <item>100K</item>
+         <item>200K</item>
+-        <item>300K</item>
++        <item>1024K</item> <!-- jianqiu modify 20160321 -->
+     </string-array>
+     <string-array name="pref_mms_size_limit_values" translatable="false">
+         <item>100</item>
+         <item>200</item>
+-        <item>300</item>
++        <item>1024</item> <!-- jianqiu modify 20160321 -->
+     </string-array>  
+     <string-array name="pref_key_mms_priority_choices">
+         <item>High</item>
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/mms_config.xml b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/mms_config.xml
+old mode 100644
+new mode 100755
+index 3e87525..5193f8d
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/mms_config.xml
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/mms_config.xml
+@@ -26,7 +26,7 @@
+     <bool name="enabledMMS">true</bool>
+ 
+     <!-- Maximum message size in bytes for a MMS message -->
+-    <int name="maxMessageSize">307200</int>
++    <int name="maxMessageSize">1048576</int> <!--jianqiu modify 201321 -->
+ 
+     <!-- Maximum height for an attached image -->
+     <int name="maxImageHeight">480</int>
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/mmspreferences.xml b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/mmspreferences.xml
+index 7219d8d..681f0ea 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/mmspreferences.xml
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/mmspreferences.xml
+@@ -45,7 +45,7 @@
+             android:title="@string/pref_title_mms_size_limit"
+             android:dialogTitle="@string/pref_title_mms_size_limit"
+             android:summary="@string/pref_summary_mms_size_limit"
+-            android:defaultValue="300" android:entries="@array/pref_mms_size_limit_choices"
++            android:defaultValue="1024" android:entries="@array/pref_mms_size_limit_choices"
+             android:entryValues="@array/pref_mms_size_limit_values" />
+         <ListPreference android:key="pref_key_mms_priority"
+             android:title="@string/mms_priority_label" android:dialogTitle="@string/mms_priority_label"
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/multicardpreferences.xml b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/multicardpreferences.xml
+index 70a9ebe..6b4c411 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/multicardpreferences.xml
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/multicardpreferences.xml
+@@ -119,7 +119,7 @@
+             android:title="@string/pref_title_mms_size_limit"
+             android:dialogTitle="@string/pref_title_mms_size_limit"
+             android:summary="@string/pref_summary_mms_size_limit"
+-            android:defaultValue="300"
++            android:defaultValue="1024"
+             android:entries="@array/pref_mms_size_limit_choices"
+             android:entryValues="@array/pref_mms_size_limit_values"/>
+    <ListPreference
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/preferences.xml b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/preferences.xml
+old mode 100644
+new mode 100755
+index 0017a83..1778181
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/preferences.xml
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/preferences.xml
+@@ -127,7 +127,7 @@
+             android:title="@string/pref_title_mms_size_limit"
+             android:dialogTitle="@string/pref_title_mms_size_limit"
+             android:summary="@string/pref_summary_mms_size_limit"
+-            android:defaultValue="300"
++            android:defaultValue="1024"
+             android:entries="@array/pref_mms_size_limit_choices"
+             android:entryValues="@array/pref_mms_size_limit_values"/>
+     <ListPreference
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/MmsConfig.java b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/MmsConfig.java
+index 590e8f0..7e59900 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/MmsConfig.java
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/MmsConfig.java
+@@ -95,7 +95,7 @@ public class MmsConfig {
+      */
+     private static boolean mTransIdEnabled = false;
+     private static int mMmsEnabled = 1;                         // default to true
+-    private static int mMaxMessageSize = 300 * 1024;            // default to 300k max size
++    private static int mMaxMessageSize = 1024 * 1024;            // default to 300k max size //jianqiu modify 20160321
+     private static String mUserAgent = DEFAULT_USER_AGENT;
+     private static String mUaProfTagName = DEFAULT_HTTP_KEY_X_WAP_PROFILE;
+     private static String mUaProfUrl = null;
+@@ -152,7 +152,7 @@ public class MmsConfig {
+     private static final int RECIPIENTS_LIMIT = 50;
+ 
+     /// M: Mms size limit, default 300K.
+-    private static int mUserSetMmsSizeLimit = 300;
++    private static int mUserSetMmsSizeLimit = 1024; //jianqiu modify 20160321
+     /// M: Receive Mms size limit for 2G network
+     private static int mReceiveMmsSizeLimitFor2G = 200;
+     /// M: Receive Mms size limit for TD network
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/ComposeMessageActivity.java b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/ComposeMessageActivity.java
+index 3c2b730..cbc8260 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/ComposeMessageActivity.java
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/ComposeMessageActivity.java
+@@ -4961,6 +4961,10 @@ public class ComposeMessageActivity extends Activity
+                     sizeLimit -= textSize;
+                 }
+                 if (sizeLimit > MIN_SIZE_FOR_CAPTURE_VIDEO) {
++			//jianqiu modify 20160321
++		      if(sizeLimit > 1024 *1000){
++			  	sizeLimit = 1024 *1000;
++		      	}
+                     MessageUtils.recordVideo(this, REQUEST_CODE_TAKE_VIDEO, sizeLimit);
+                 } else {
+                     Toast.makeText(this,
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/MessageUtils.java b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/MessageUtils.java
+old mode 100644
+new mode 100755
+index 0aa9025..61b5e3d
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/MessageUtils.java
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/MessageUtils.java
+@@ -864,7 +864,10 @@ public class MessageUtils {
+             log("recordVideo: durationLimit: " + durationLimit +
+                     " sizeLimit: " + sizeLimit);
+         }
+-
++		//jianqiu add 20160321
++	if(0<durationLimit&&durationLimit<100){
++		durationLimit=100;
++	}
+             Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+             intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
+             intent.putExtra("android.intent.extra.sizeLimit", sizeLimit);
+@@ -3060,14 +3063,14 @@ public class MessageUtils {
+         String mSizeLimitTemp = null;
+         int mMmsSizeLimit = 0;
+         if (sp != null) {
+-            mSizeLimitTemp = sp.getString("pref_key_mms_size_limit", "300");
++            mSizeLimitTemp = sp.getString("pref_key_mms_size_limit", "1024");
+         }
+         if (mSizeLimitTemp != null && 0 == mSizeLimitTemp.compareTo("100")) {
+             mMmsSizeLimit = 100;
+         } else if (mSizeLimitTemp != null && 0 == mSizeLimitTemp.compareTo("200")) {
+             mMmsSizeLimit = 200;
+         } else {
+-            mMmsSizeLimit = 300;
++            mMmsSizeLimit = 1024;
+         }
+         MmsConfig.setUserSetMmsSizeLimit(mMmsSizeLimit);
+     }
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/setting/MmsPreferenceActivity.java b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/setting/MmsPreferenceActivity.java
+index 5b3ac68..304028f 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/setting/MmsPreferenceActivity.java
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/setting/MmsPreferenceActivity.java
+@@ -146,7 +146,8 @@ public class MmsPreferenceActivity extends PreferenceActivity
+ 
+     private static final String SIZE_LIMIT_200 = "200";
+ 
+-    private static final String SIZE_LIMIT_300 = "300";
++    //private static final String SIZE_LIMIT_300 = "300";
++    private static final String SIZE_LIMIT_1024 = "1024"; //jianqiu modify 20160321
+ 
+     private Handler mSMSHandler = new Handler();
+ 
+@@ -190,7 +191,7 @@ public class MmsPreferenceActivity extends PreferenceActivity
+                 stored, R.array.pref_mms_creation_mode_choices,
+                 R.array.pref_mms_creation_mode_values));
+         // For mMmsSizeLimit
+-        stored = sp.getString(MMS_SIZE_LIMIT, SIZE_LIMIT_300);
++        stored = sp.getString(MMS_SIZE_LIMIT, SIZE_LIMIT_1024);
+         mMmsSizeLimit.setSummary(MessageUtils.getVisualTextName(this,
+                 stored, R.array.pref_mms_size_limit_choices,
+                 R.array.pref_mms_size_limit_values));
+@@ -438,7 +439,7 @@ public class MmsPreferenceActivity extends PreferenceActivity
+         }
+ 
+         editor.putString(CREATION_MODE, CREATION_MODE_FREE);
+-        editor.putString(MMS_SIZE_LIMIT, SIZE_LIMIT_300);
++        editor.putString(MMS_SIZE_LIMIT, SIZE_LIMIT_1024);
+         editor.putString(PRIORITY, PRIORITY_NORMAL);
+         /// M: fix bug ALPS00432361, restore default preferences
+         /// about GroupMms and ShowEmailAddress @{
+-- 
+2.3.7
+

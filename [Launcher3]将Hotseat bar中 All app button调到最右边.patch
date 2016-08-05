@@ -1,0 +1,38 @@
+From e1e47f0fc1e9e413d67e8a6afe591d49a93e1493 Mon Sep 17 00:00:00 2001
+From: moduanke <moduanke@hkzechin.com>
+Date: Fri, 4 Mar 2016 15:29:17 +0800
+Subject: [PATCH] =?UTF-8?q?[Azumi][Launcher3]=E5=B0=86Hotseat=20bar?=
+ =?UTF-8?q?=E4=B8=AD=20All=20app=20button=E8=B0=83=E5=88=B0=E6=9C=80?=
+ =?UTF-8?q?=E5=8F=B3=E8=BE=B9?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../Launcher3/src/com/android/launcher3/InvariantDeviceProfile.java  | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/alps/packages/apps/Launcher3/src/com/android/launcher3/InvariantDeviceProfile.java b/alps/packages/apps/Launcher3/src/com/android/launcher3/InvariantDeviceProfile.java
+index ae204c4..165d264 100755
+--- a/alps/packages/apps/Launcher3/src/com/android/launcher3/InvariantDeviceProfile.java
++++ b/alps/packages/apps/Launcher3/src/com/android/launcher3/InvariantDeviceProfile.java
+@@ -140,7 +140,8 @@ public class InvariantDeviceProfile {
+         numRows = closestProfile.numRows;
+         numColumns = closestProfile.numColumns;
+         numHotseatIcons = closestProfile.numHotseatIcons;
+-        hotseatAllAppsRank = (int) (numHotseatIcons / 2);
++        //hotseatAllAppsRank = (int) (numHotseatIcons / 2);
++        hotseatAllAppsRank = 4;
+         defaultLayoutId = closestProfile.defaultLayoutId;
+         numFolderRows = closestProfile.numFolderRows;
+         numFolderColumns = closestProfile.numFolderColumns;
+@@ -300,4 +301,4 @@ public class InvariantDeviceProfile {
+         }
+         return (float) (WEIGHT_EFFICIENT / Math.pow(d, pow));
+     }
+-}
+\ No newline at end of file
++}
+-- 
+2.3.7
+
