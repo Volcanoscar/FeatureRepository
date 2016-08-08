@@ -1,0 +1,137 @@
+From a9982529bd1c539cf66bcca64cd60b67d9085a9a Mon Sep 17 00:00:00 2001
+From: moduanke <moduanke@hkzechin.com>
+Date: Thu, 26 May 2016 16:26:07 +0800
+Subject: [PATCH] =?UTF-8?q?[Bmobile][Telephony]=E8=AE=BE=E7=BD=AE-?=
+ =?UTF-8?q?=E6=9B=B4=E5=A4=9A-=E7=A7=BB=E5=8A=A8=E7=BD=91=E7=BB=9C?=
+ =?UTF-8?q?=E4=B8=8B=E5=8A=A0=E5=85=A5only=203G=E9=A1=B9?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../services/Telephony/res/values-es-rUS/strings.xml   | 11 +++++++++--
+ .../packages/services/Telephony/res/values/strings.xml |  7 ++++++-
+ .../src/com/android/phone/MobileNetworkSettings.java   | 18 +++++++++++++++++-
+ 3 files changed, 32 insertions(+), 4 deletions(-)
+ mode change 100644 => 100755 alps/packages/services/Telephony/res/values-es-rUS/strings.xml
+ mode change 100644 => 100755 alps/packages/services/Telephony/res/values/strings.xml
+ mode change 100644 => 100755 alps/packages/services/Telephony/src/com/android/phone/MobileNetworkSettings.java
+
+diff --git a/alps/packages/services/Telephony/res/values-es-rUS/strings.xml b/alps/packages/services/Telephony/res/values-es-rUS/strings.xml
+old mode 100644
+new mode 100755
+index 92384c1..1ef44aa
+--- a/alps/packages/services/Telephony/res/values-es-rUS/strings.xml
++++ b/alps/packages/services/Telephony/res/values-es-rUS/strings.xml
+@@ -302,8 +302,15 @@
+     <string name="enable_disable_multi_category" msgid="626771003122899280">"Varias categorías"</string>
+     <string name="multi_category_enable" msgid="1179299804641721768">"Varias categorías activadas"</string>
+     <string name="multi_category_disable" msgid="880104702904139505">"Varias categorías desactivadas"</string>
+-    <string name="network_lte" msgid="7702681952521375754">"LTE (recomendado)"</string>
+-    <string name="network_4G" msgid="2723512640529983138">"4G (recomendado)"</string>
++    <!--<string name="network_lte" msgid="7702681952521375754">"LTE (recomendado)"</string>
++    <string name="network_4G" msgid="2723512640529983138">"4G (recomendado)"</string>-->
++    <string name="network_lte" msgid="7702681952521375754">"LTE/WCDMA/GSM(Recomendado)"</string>
++    <string name="network_4G" msgid="2723512640529983138">"4G(recomendado)"</string>
++    <!--Moka add-->
++    <string name="network_3G" translatable="false">WCDMA/GSM</string><!--@darren 20150822 add for 3G-->
++    <string name="network_2G" translatable="false">Solo GSM</string><!--@darren 20150822 add for 2G-->
++    <string name="network_3G_only" translatable="false">Solo WCDMA</string>     
++
+     <string name="network_global" msgid="1323190488685355309">"Global"</string>
+     <string name="cdma_system_select_title" msgid="5757657769327732833">"Sistema seleccionado"</string>
+     <string name="cdma_system_select_summary" msgid="60460043745797517">"Cambiar el modo itinerancia CDMA"</string>
+diff --git a/alps/packages/services/Telephony/res/values/strings.xml b/alps/packages/services/Telephony/res/values/strings.xml
+old mode 100644
+new mode 100755
+index 52e4961..3b5333a
+--- a/alps/packages/services/Telephony/res/values/strings.xml
++++ b/alps/packages/services/Telephony/res/values/strings.xml
+@@ -584,8 +584,9 @@
+ 
+     <string name="network_lte">LTE (recommended)</string>
+     <string name="network_4G">4G (recommended)</string>
+-    <string name="network_3G" translatable="false">3G</string>
++    <string name="network_3G" translatable="false">3G/2G Auto</string>
+     <string name="network_2G" translatable="false">2G</string>
++    <string name="network_3G_only" translatable="false">3G</string>    
+     <string name="network_1x" translatable="false">1x</string>
+     <string name="network_global">Global</string>
+ 
+@@ -604,10 +605,12 @@
+ 
+     <string-array name="enabled_networks_except_lte_choices" translatable="false">
+         <item>@string/network_3G</item>
++        <item>@string/network_3G_only</item>           
+         <item>@string/network_2G</item>
+     </string-array>
+     <string-array name="enabled_networks_except_lte_values" translatable="false">
+         <item>"0"</item>
++        <item>"2"</item>            
+         <item>"1"</item>
+     </string-array>
+ 
+@@ -621,6 +624,7 @@
+     <string-array name="enabled_networks_choices" translatable="false">
+         <item>@string/network_lte</item>
+         <item>@string/network_3G</item>
++        <item>@string/network_3G_only</item>
+         <item>@string/network_2G</item>
+     </string-array>
+     <string-array name="enabled_networks_4g_choices" translatable="false">
+@@ -631,6 +635,7 @@
+     <string-array name="enabled_networks_values" translatable="false">
+         <item>"9"</item>
+         <item>"0"</item>
++        <item>"2"</item>
+         <item>"1"</item>
+     </string-array>
+ 
+diff --git a/alps/packages/services/Telephony/src/com/android/phone/MobileNetworkSettings.java b/alps/packages/services/Telephony/src/com/android/phone/MobileNetworkSettings.java
+old mode 100644
+new mode 100755
+index d1dbc6f..13391d3
+--- a/alps/packages/services/Telephony/src/com/android/phone/MobileNetworkSettings.java
++++ b/alps/packages/services/Telephony/src/com/android/phone/MobileNetworkSettings.java
+@@ -962,6 +962,8 @@ public class MobileNetworkSettings extends PreferenceActivity implements
+                 switch (buttonNetworkMode) {
+                     case Phone.NT_MODE_WCDMA_PREF:
+                     case Phone.NT_MODE_GSM_ONLY:
++		//jianqiu modify 20160506
++                    case Phone.NT_MODE_WCDMA_ONLY:						
+                     case Phone.NT_MODE_LTE_GSM_WCDMA:
+                     case Phone.NT_MODE_LTE_CDMA_EVDO_GSM_WCDMA:
+                     case Phone.NT_MODE_CDMA:
+@@ -1192,7 +1194,8 @@ public class MobileNetworkSettings extends PreferenceActivity implements
+         }
+         // @}
+         switch (NetworkMode) {
+-            case Phone.NT_MODE_WCDMA_ONLY:
++	  //jianqiu modify 20160506			
++            //case Phone.NT_MODE_WCDMA_ONLY:
+             case Phone.NT_MODE_GSM_UMTS:
+             case Phone.NT_MODE_WCDMA_PREF:
+                 if (!mIsGlobalCdma) {
+@@ -1216,6 +1219,19 @@ public class MobileNetworkSettings extends PreferenceActivity implements
+                     mButtonEnabledNetworks.setSummary(R.string.network_global);
+                 }
+                 break;
++	  //jianqiu modify 20160506
++            case Phone.NT_MODE_WCDMA_ONLY:
++                if (!mIsGlobalCdma) {
++                    Log.d(LOG_TAG, "NetworkMode  =  NT_MODE_WCDMA_ONLY: " + NetworkMode);					
++                    mButtonEnabledNetworks.setValue(
++                            Integer.toString(Phone.NT_MODE_WCDMA_ONLY));
++                    mButtonEnabledNetworks.setSummary(R.string.network_3G_only);
++                } else {
++                    mButtonEnabledNetworks.setValue(
++                            Integer.toString(Phone.NT_MODE_LTE_CDMA_EVDO_GSM_WCDMA));
++                    mButtonEnabledNetworks.setSummary(R.string.network_global);
++                }
++                break;
+             case Phone.NT_MODE_LTE_GSM_WCDMA:
+                 if (isWorldMode()) {
+                     mButtonEnabledNetworks.setSummary(
+-- 
+2.3.7
+

@@ -1,0 +1,729 @@
+From d81f2c12c9e298199893fbfe629ec714483fe402 Mon Sep 17 00:00:00 2001
+From: tianyunfei <tianyunfei@hkzechin.com>
+Date: Wed, 9 Mar 2016 19:29:56 +0800
+Subject: [PATCH] =?UTF-8?q?[BLU][Settings/SystemUI]=E5=9C=A8=E8=AE=BE?=
+ =?UTF-8?q?=E7=BD=AE=E4=B8=AD=E6=B7=BB=E5=8A=A0=E5=BC=80/=E5=85=B3?=
+ =?UTF-8?q?=E7=8A=B6=E6=80=81=E6=A0=8F=E6=98=BE=E7=A4=BA=E7=94=B5=E6=B1=A0?=
+ =?UTF-8?q?=E7=94=B5=E9=87=8F=E7=99=BE=E5=88=86=E6=AF=94=E7=9A=84=E9=80=89?=
+ =?UTF-8?q?=E9=A1=B9?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../base/core/java/android/provider/Settings.java  |  2 +
+ .../SettingsProvider/res/values/defaults.xml       |  4 +
+ .../android/providers/settings/DatabaseHelper.java |  4 +
+ .../packages/SystemUI/res/layout/system_icons.xml  | 11 +++
+ .../base/packages/SystemUI/res/values/strings.xml  |  5 ++
+ .../systemui/statusbar/phone/PhoneStatusBar.java   |  1 +
+ .../statusbar/policy/BatteryController.java        | 93 ++++++++++++++++++++++
+ .../apps/Settings/res/values-ar/strings.xml        |  1 +
+ .../apps/Settings/res/values-bg/strings.xml        |  1 +
+ .../apps/Settings/res/values-cs/strings.xml        |  1 +
+ .../apps/Settings/res/values-de/strings.xml        |  1 +
+ .../apps/Settings/res/values-el/strings.xml        |  1 +
+ .../apps/Settings/res/values-en-rGB/strings.xml    |  1 +
+ .../apps/Settings/res/values-es-rUS/strings.xml    |  1 +
+ .../apps/Settings/res/values-es/strings.xml        |  1 +
+ .../apps/Settings/res/values-fa/strings.xml        |  1 +
+ .../apps/Settings/res/values-fr/strings.xml        |  1 +
+ .../apps/Settings/res/values-hr/strings.xml        |  1 +
+ .../apps/Settings/res/values-hu/strings.xml        |  1 +
+ .../apps/Settings/res/values-iw/strings.xml        |  1 +
+ .../apps/Settings/res/values-nl/strings.xml        |  1 +
+ .../apps/Settings/res/values-pl/strings.xml        |  1 +
+ .../apps/Settings/res/values-pt-rPT/strings.xml    |  1 +
+ .../apps/Settings/res/values-pt/strings.xml        |  1 +
+ .../apps/Settings/res/values-ru/strings.xml        |  1 +
+ .../apps/Settings/res/values-vi/strings.xml        |  1 +
+ .../apps/Settings/res/values-zh-rCN/strings.xml    |  1 +
+ alps/packages/apps/Settings/res/values/strings.xml |  2 +
+ .../settings/fuelgauge/PowerUsageSummary.java      |  2 +
+ .../settings/fuelgauge/PowerUsageExts.java         | 82 +++++++++++++++++++
+ 30 files changed, 226 insertions(+)
+ mode change 100644 => 100755 alps/frameworks/base/core/java/android/provider/Settings.java
+ mode change 100644 => 100755 alps/frameworks/base/packages/SystemUI/res/layout/system_icons.xml
+ mode change 100644 => 100755 alps/frameworks/base/packages/SystemUI/res/values/strings.xml
+ mode change 100644 => 100755 alps/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java
+ mode change 100644 => 100755 alps/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/policy/BatteryController.java
+ mode change 100644 => 100755 alps/packages/apps/Settings/res/values-ar/strings.xml
+ mode change 100644 => 100755 alps/packages/apps/Settings/res/values-bg/strings.xml
+ mode change 100644 => 100755 alps/packages/apps/Settings/res/values-cs/strings.xml
+ mode change 100644 => 100755 alps/packages/apps/Settings/res/values-de/strings.xml
+ mode change 100644 => 100755 alps/packages/apps/Settings/res/values-el/strings.xml
+ mode change 100644 => 100755 alps/packages/apps/Settings/res/values-es-rUS/strings.xml
+ mode change 100644 => 100755 alps/packages/apps/Settings/res/values-fa/strings.xml
+ mode change 100644 => 100755 alps/packages/apps/Settings/res/values-fr/strings.xml
+ mode change 100644 => 100755 alps/packages/apps/Settings/res/values-hr/strings.xml
+ mode change 100644 => 100755 alps/packages/apps/Settings/res/values-hu/strings.xml
+ mode change 100644 => 100755 alps/packages/apps/Settings/res/values-iw/strings.xml
+ mode change 100644 => 100755 alps/packages/apps/Settings/res/values-nl/strings.xml
+ mode change 100644 => 100755 alps/packages/apps/Settings/res/values-pl/strings.xml
+ mode change 100644 => 100755 alps/packages/apps/Settings/res/values-ru/strings.xml
+ mode change 100644 => 100755 alps/packages/apps/Settings/res/values-vi/strings.xml
+ mode change 100644 => 100755 alps/packages/apps/Settings/res/values-zh-rCN/strings.xml
+ mode change 100644 => 100755 alps/packages/apps/Settings/src/com/android/settings/fuelgauge/PowerUsageSummary.java
+
+diff --git a/alps/frameworks/base/core/java/android/provider/Settings.java b/alps/frameworks/base/core/java/android/provider/Settings.java
+old mode 100644
+new mode 100755
+index 9c3e128..3e17be9
+--- a/alps/frameworks/base/core/java/android/provider/Settings.java
++++ b/alps/frameworks/base/core/java/android/provider/Settings.java
+@@ -1240,6 +1240,8 @@ public final class Settings {
+     private static final String TAG = "SettingsInterface";
+     private static final boolean LOCAL_LOGV = false;
+     private static final boolean DEBUG_LOGV = true;
++    
++    public static final String BATTERY_PERCENTAGE = "battery_percentage";//tianyunfei 20150908 add for show battery percentage in status bar
+ 
+     // Lock ensures that when enabling/disabling the master location switch, we don't end up
+     // with a partial enable/disable state in multi-threaded situations.
+diff --git a/alps/frameworks/base/packages/SettingsProvider/res/values/defaults.xml b/alps/frameworks/base/packages/SettingsProvider/res/values/defaults.xml
+index ef74f53..f632e9c 100755
+--- a/alps/frameworks/base/packages/SettingsProvider/res/values/defaults.xml
++++ b/alps/frameworks/base/packages/SettingsProvider/res/values/defaults.xml
+@@ -213,4 +213,8 @@
+ 
+     <!-- Default for Settings.Secure.NFC_PAYMENT_COMPONENT -->
+     <string name="def_nfc_payment_component"></string>
++    
++    <!--tianyunfei 20150908 add for show battery percentage in status bar-->
++    <!-- Default for Settings.Secure.BATTERY_PERCENTAGE_ENABLED -->
++    <bool name="def_battery_percentage">true</bool>
+ </resources>
+diff --git a/alps/frameworks/base/packages/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java b/alps/frameworks/base/packages/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java
+index 8b4fa0c..c4f3c57 100755
+--- a/alps/frameworks/base/packages/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java
++++ b/alps/frameworks/base/packages/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java
+@@ -2557,6 +2557,10 @@ class DatabaseHelper extends SQLiteOpenHelper {
+ 
+             loadIntegerSetting(stmt, Settings.Secure.SLEEP_TIMEOUT,
+                     R.integer.def_sleep_timeout);
++                    
++            loadBooleanSetting(stmt, Settings.Secure.BATTERY_PERCENTAGE,
++                    R.bool.def_battery_percentage);//tianyunfei 20150908 add for show battery percentage in status bar
++
+ 
+             /*
+              * IMPORTANT: Do not add any more upgrade steps here as the global,
+diff --git a/alps/frameworks/base/packages/SystemUI/res/layout/system_icons.xml b/alps/frameworks/base/packages/SystemUI/res/layout/system_icons.xml
+old mode 100644
+new mode 100755
+index 943e846..28b8ea1
+--- a/alps/frameworks/base/packages/SystemUI/res/layout/system_icons.xml
++++ b/alps/frameworks/base/packages/SystemUI/res/layout/system_icons.xml
+@@ -31,6 +31,17 @@
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_marginStart="2.5dp"/>
++        
++     <!--tianyunfei 20150908 add for show battery percentage in status bar begin-->
++    <TextView
++        android:id="@+id/percentage"
++        android:layout_height="wrap_content"
++        android:layout_width="wrap_content"
++        android:visibility = "gone"
++        android:paddingStart="4dip"
++        android:paddingEnd="4dip"
++        android:textAppearance="@style/TextAppearance.StatusBar.Clock"/>
++    <!--tianyunfei 20150908 add for show battery percentage in status bar end-->
+ 
+     <!-- battery must be padded below to match assets -->
+     <com.android.systemui.BatteryMeterView android:id="@+id/battery"
+diff --git a/alps/frameworks/base/packages/SystemUI/res/values/strings.xml b/alps/frameworks/base/packages/SystemUI/res/values/strings.xml
+old mode 100644
+new mode 100755
+index 3eac84f..fb80370
+--- a/alps/frameworks/base/packages/SystemUI/res/values/strings.xml
++++ b/alps/frameworks/base/packages/SystemUI/res/values/strings.xml
+@@ -1119,5 +1119,10 @@
+ 
+     <!-- Dialog asking if the tuner should really be removed from settings [CHAR LIMIT=NONE]-->
+     <string name="remove_from_settings_prompt">Remove System UI Tuner from Settings and stop using all of its features?"</string>
++    
++    <!-- tianyunfei 20150908 add for show battery percentage in status bar -->
++    <string name="status_bar_settings_battery_meter_format" translatable="false">
++        <xliff:g id="number">%d</xliff:g><xliff:g id="percent">%%</xliff:g>
++    </string>
+ 
+ </resources>
+diff --git a/alps/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java b/alps/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java
+old mode 100644
+new mode 100755
+index 44c354a..916cf2e
+--- a/alps/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java
++++ b/alps/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java
+@@ -843,6 +843,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
+         mLocationController = new LocationControllerImpl(mContext,
+                 mHandlerThread.getLooper()); // will post a notification
+         mBatteryController = new BatteryController(mContext);
++        mBatteryController.addLabelView((TextView) mStatusBarWindow.findViewById(R.id.percentage));//tianyunfei 20150908 add for show battery percentage in status bar
+         mBatteryController.addStateChangedCallback(new BatteryStateChangeCallback() {
+             @Override
+             public void onPowerSaveChanged() {
+diff --git a/alps/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/policy/BatteryController.java b/alps/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/policy/BatteryController.java
+old mode 100644
+new mode 100755
+index d1b69ab..9430074
+--- a/alps/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/policy/BatteryController.java
++++ b/alps/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/policy/BatteryController.java
+@@ -28,6 +28,16 @@ import java.io.FileDescriptor;
+ import java.io.PrintWriter;
+ import java.util.ArrayList;
+ 
++/*tianyunfei 20150908 add for show battery percentage in status bar begin*/
++import android.widget.TextView;
++import android.provider.Settings;
++import android.view.View;
++import com.mediatek.systemui.statusbar.util.SIMHelper;
++import android.app.ActivityManager;
++import com.android.systemui.R;
++/*tianyunfei 20150908 add for show battery percentage in status bar end*/
++
++
+ public class BatteryController extends BroadcastReceiver {
+     private static final String TAG = "BatteryController";
+     private static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);
+@@ -40,14 +50,43 @@ public class BatteryController extends BroadcastReceiver {
+     private boolean mCharging;
+     private boolean mCharged;
+     private boolean mPowerSave;
++    
++    /*tianyunfei 20150908 add for show battery percentage in status bar begin*/
++    private static final String ACTION_BATTERY_PERCENTAGE_SWITCH = "mediatek.intent.action.BATTERY_PERCENTAGE_SWITCH";
++    private boolean mShouldShowBatteryPercentage = false;
++    private String mBatteryPercentage = "100%";
++    private Context mContext;
++    private ArrayList<TextView> mLabelViews = new ArrayList<TextView>();
++
++    public void addLabelView(TextView v) {
++        mLabelViews.add(v);
++    }
++    /*tianyunfei 20150908 add for show battery percentage in status bar end*/
+ 
+     public BatteryController(Context context) {
+         mPowerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
++        
++        /*tianyunfei 20150908 add for show battery percentage in status bar begin*/
++        mContext = context;
++        mShouldShowBatteryPercentage = (Settings.Secure.getInt(context
++                .getContentResolver(), Settings.Secure.BATTERY_PERCENTAGE, 0) != 0);
++        /// M: Don't support battery percentage with smartbook plugged in.
++        if (SIMHelper.isSmartBookPluggedIn(mContext)) {
++            mShouldShowBatteryPercentage = false;
++        }
++        Log.d(TAG, "[BP]--BatteryController mShouldShowBatteryPercentage is "
++                + mShouldShowBatteryPercentage);
++        /*tianyunfei 20150908 add for show battery percentage in status bar end*/
+ 
+         IntentFilter filter = new IntentFilter();
+         filter.addAction(Intent.ACTION_BATTERY_CHANGED);
+         filter.addAction(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED);
+         filter.addAction(PowerManager.ACTION_POWER_SAVE_MODE_CHANGING);
++        /*tianyunfei 20150908 add for show battery percentage in status bar begin*/
++        filter.addAction(ACTION_BATTERY_PERCENTAGE_SWITCH);
++        filter.addAction(Intent.ACTION_USER_SWITCHED);
++         /*tianyunfei 20150908 add for show battery percentage in status bar end*/
++
+         context.registerReceiver(this, filter);
+ 
+         updatePowerSave();
+@@ -83,14 +122,68 @@ public class BatteryController extends BroadcastReceiver {
+                     BatteryManager.BATTERY_STATUS_UNKNOWN);
+             mCharged = status == BatteryManager.BATTERY_STATUS_FULL;
+             mCharging = mCharged || status == BatteryManager.BATTERY_STATUS_CHARGING;
++            
++            /*tianyunfei 20150908 add for show battery percentage in status bar begin*/
++            int N = mLabelViews.size();
++            for (int i=0; i<N; i++) {
++                TextView v = mLabelViews.get(i);
++                v.setText(mContext.getString(R.string.status_bar_settings_battery_meter_format,
++                        mLevel));
++            }
++            /*tianyunfei 20150908 add for show battery percentage in status bar end*/
+ 
+             fireBatteryLevelChanged();
++            
++            /*tianyunfei 20150908 add for show battery percentage in status bar begin*/
++            mBatteryPercentage = getBatteryPercentage(intent);
++            Log.d(TAG,"[BP]--mBatteryPercentage is " + mBatteryPercentage + " mShouldShowBatteryPercentage is "
++                    + mShouldShowBatteryPercentage + " mLabelViews.size() " + mLabelViews.size());
++            refreshBatteryPercentage();
++            /*tianyunfei 20150908 add for show battery percentage in status bar end*/
+         } else if (action.equals(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED)) {
+             updatePowerSave();
+         } else if (action.equals(PowerManager.ACTION_POWER_SAVE_MODE_CHANGING)) {
+             setPowerSave(intent.getBooleanExtra(PowerManager.EXTRA_POWER_SAVE_MODE, false));
+         }
++         /*tianyunfei 20150908 add for show battery percentage in status bar begin*/
++        else if (action.equals(ACTION_BATTERY_PERCENTAGE_SWITCH)) {
++            mShouldShowBatteryPercentage = (intent.getIntExtra("state",0) == 1);
++            Log.d(TAG, " [BP]--OnReceive from mediatek.intent.ACTION_BATTERY_PERCENTAGE_SWITCH  mShouldShowBatteryPercentage" +
++                    " is " + mShouldShowBatteryPercentage);
++            refreshBatteryPercentage();
++        } else if (Intent.ACTION_USER_SWITCHED.equals(action)) {
++            mShouldShowBatteryPercentage = (Settings.Secure.getIntForUser(context
++                    .getContentResolver(), Settings.Secure.BATTERY_PERCENTAGE, 0, ActivityManager.getCurrentUser()) != 0);
++            Log.d(TAG, "[BP]--ACTION_USER_SWITCHED mShouldShowBatteryPercentage is "
++                    + mShouldShowBatteryPercentage + " ActivityManager.getCurrentUser() is " + ActivityManager.getCurrentUser());
++            refreshBatteryPercentage();
++        }
++        /*tianyunfei 20150908 add for show battery percentage in status bar end*/
++
++    }
++    
++    /*tianyunfei 20150908 add for show battery percentage in status bar begin*/
++    private  String getBatteryPercentage(Intent batteryChangedIntent) {
++        int level = batteryChangedIntent.getIntExtra("level", 0);
++        int scale = batteryChangedIntent.getIntExtra("scale", 100);
++        return String.valueOf(level * 100 / scale) + "%";
+     }
++        /// M: Support "battery percentage". @{
++    private void refreshBatteryPercentage() {
++        if (mLabelViews.size() > 0) {
++            TextView v = mLabelViews.get(0);
++            if (v != null) {
++                if (mShouldShowBatteryPercentage) {
++                    v.setText(mBatteryPercentage);
++                    v.setVisibility(View.VISIBLE);
++                } else {
++                    v.setVisibility(View.GONE);
++                }
++            }
++        }
++     }
++    /*tianyunfei 20150908 add for show battery percentage in status bar end*/
++
+ 
+     public boolean isPowerSave() {
+         return mPowerSave;
+diff --git a/alps/packages/apps/Settings/res/values-ar/strings.xml b/alps/packages/apps/Settings/res/values-ar/strings.xml
+old mode 100644
+new mode 100755
+index 5dd1785..e05eb0f
+--- a/alps/packages/apps/Settings/res/values-ar/strings.xml
++++ b/alps/packages/apps/Settings/res/values-ar/strings.xml
+@@ -2733,6 +2733,7 @@
+     <string name="imei_information_title" msgid="8499085421609752290">"‏معلومات IMEI"</string>
+     <string name="imei_information_summary" msgid="2074095606556565233">"‏المعلومات ذات الصلة بـ IMEI"</string>
+     <string name="slot_number" msgid="3762676044904653577">"(فتحة <xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
++    <string name="battery_percent">النسبة المئوية لطاقة البطارية</string>
+     <string name="launch_by_default" msgid="1840761193189009248">"الفتح افتراضيًا"</string>
+     <string name="storage_summary_format" msgid="5419902362347539755">"تم استخدام <xliff:g id="SIZE">%1$s</xliff:g> في <xliff:g id="STORAGE_TYPE">%2$s</xliff:g>"</string>
+     <string name="app_launch_domain_links_title" msgid="6789955009107320092">"روابط التطبيق"</string>
+diff --git a/alps/packages/apps/Settings/res/values-bg/strings.xml b/alps/packages/apps/Settings/res/values-bg/strings.xml
+old mode 100644
+new mode 100755
+index 108a775..6b5ee8c
+--- a/alps/packages/apps/Settings/res/values-bg/strings.xml
++++ b/alps/packages/apps/Settings/res/values-bg/strings.xml
+@@ -2685,6 +2685,7 @@
+     <string name="imei_information_title" msgid="8499085421609752290">"Информация за IMEI"</string>
+     <string name="imei_information_summary" msgid="2074095606556565233">"Информация относно IMEI"</string>
+     <string name="slot_number" msgid="3762676044904653577">"(слот <xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
++    <string name="battery_percent">Процент на батерията</string>
+     <string name="launch_by_default" msgid="1840761193189009248">"Отваряне по подразбиране"</string>
+     <string name="storage_summary_format" msgid="5419902362347539755">"Използва/т се <xliff:g id="SIZE">%1$s</xliff:g> от <xliff:g id="STORAGE_TYPE">%2$s</xliff:g>"</string>
+     <string name="app_launch_domain_links_title" msgid="6789955009107320092">"Връзки за приложението"</string>
+diff --git a/alps/packages/apps/Settings/res/values-cs/strings.xml b/alps/packages/apps/Settings/res/values-cs/strings.xml
+old mode 100644
+new mode 100755
+index 5ae48824..61440bb
+--- a/alps/packages/apps/Settings/res/values-cs/strings.xml
++++ b/alps/packages/apps/Settings/res/values-cs/strings.xml
+@@ -2709,6 +2709,7 @@
+     <string name="imei_information_title" msgid="8499085421609752290">"Informace o kódu IMEI"</string>
+     <string name="imei_information_summary" msgid="2074095606556565233">"Informace související s kódem IMEI"</string>
+     <string name="slot_number" msgid="3762676044904653577">"(Slot <xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
++    <string name="battery_percent">Procenta baterie</string>
+     <string name="launch_by_default" msgid="1840761193189009248">"Otevírat ve výchozím nastavení"</string>
+     <string name="storage_summary_format" msgid="5419902362347539755">"<xliff:g id="STORAGE_TYPE">%2$s</xliff:g> – využito <xliff:g id="SIZE">%1$s</xliff:g>"</string>
+     <string name="app_launch_domain_links_title" msgid="6789955009107320092">"Odkazy aplikací"</string>
+diff --git a/alps/packages/apps/Settings/res/values-de/strings.xml b/alps/packages/apps/Settings/res/values-de/strings.xml
+old mode 100644
+new mode 100755
+index 22fafa0..00ef89b
+--- a/alps/packages/apps/Settings/res/values-de/strings.xml
++++ b/alps/packages/apps/Settings/res/values-de/strings.xml
+@@ -2686,6 +2686,7 @@
+     <string name="imei_information_title" msgid="8499085421609752290">"IMEI-Informationen"</string>
+     <string name="imei_information_summary" msgid="2074095606556565233">"Informationen zur relativen IMEI"</string>
+     <string name="slot_number" msgid="3762676044904653577">"(Slot <xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
++    <string name="battery_percent">Akkuprozentsatz</string>
+     <string name="launch_by_default" msgid="1840761193189009248">"Standardmäßig öffnen"</string>
+     <string name="storage_summary_format" msgid="5419902362347539755">"<xliff:g id="SIZE">%1$s</xliff:g> <xliff:g id="STORAGE_TYPE">%2$s</xliff:g> belegt"</string>
+     <string name="app_launch_domain_links_title" msgid="6789955009107320092">"App-Links"</string>
+diff --git a/alps/packages/apps/Settings/res/values-el/strings.xml b/alps/packages/apps/Settings/res/values-el/strings.xml
+old mode 100644
+new mode 100755
+index d3d67fc..252e510
+--- a/alps/packages/apps/Settings/res/values-el/strings.xml
++++ b/alps/packages/apps/Settings/res/values-el/strings.xml
+@@ -2685,6 +2685,7 @@
+     <string name="imei_information_title" msgid="8499085421609752290">"Πληροφορίες IMEI"</string>
+     <string name="imei_information_summary" msgid="2074095606556565233">"Σχετικές πληροφορίες IMEI"</string>
+     <string name="slot_number" msgid="3762676044904653577">"(Υποδοχή <xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
++    <string name="battery_percent">Ποσοστό μπαταρίας</string>
+     <string name="launch_by_default" msgid="1840761193189009248">"Άνοιγμα από προεπιλογή"</string>
+     <string name="storage_summary_format" msgid="5419902362347539755">"<xliff:g id="SIZE">%1$s</xliff:g> χρησιμοποιείται στο <xliff:g id="STORAGE_TYPE">%2$s</xliff:g>"</string>
+     <string name="app_launch_domain_links_title" msgid="6789955009107320092">"Σύνδεσμοι εφαρμογών"</string>
+diff --git a/alps/packages/apps/Settings/res/values-en-rGB/strings.xml b/alps/packages/apps/Settings/res/values-en-rGB/strings.xml
+index df0be26..cb2ff4e 100755
+--- a/alps/packages/apps/Settings/res/values-en-rGB/strings.xml
++++ b/alps/packages/apps/Settings/res/values-en-rGB/strings.xml
+@@ -2685,6 +2685,7 @@
+     <string name="imei_information_title" msgid="8499085421609752290">"IMEI information"</string>
+     <string name="imei_information_summary" msgid="2074095606556565233">"IMEI-related information"</string>
+     <string name="slot_number" msgid="3762676044904653577">"(Slot<xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
++    <string name="battery_percent">Battery Percentage</string>
+     <string name="launch_by_default" msgid="1840761193189009248">"Open by default"</string>
+     <string name="storage_summary_format" msgid="5419902362347539755">"<xliff:g id="SIZE">%1$s</xliff:g> used in <xliff:g id="STORAGE_TYPE">%2$s</xliff:g>"</string>
+     <string name="app_launch_domain_links_title" msgid="6789955009107320092">"App links"</string>
+diff --git a/alps/packages/apps/Settings/res/values-es-rUS/strings.xml b/alps/packages/apps/Settings/res/values-es-rUS/strings.xml
+old mode 100644
+new mode 100755
+index 8c647c8..e6e44eb
+--- a/alps/packages/apps/Settings/res/values-es-rUS/strings.xml
++++ b/alps/packages/apps/Settings/res/values-es-rUS/strings.xml
+@@ -2683,6 +2683,7 @@
+     <string name="imei_information_title" msgid="8499085421609752290">"Información de IMEI"</string>
+     <string name="imei_information_summary" msgid="2074095606556565233">"Información relacionada con IMEI"</string>
+     <string name="slot_number" msgid="3762676044904653577">"(Ranura <xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
++    <string name="battery_percent">Porcentaje de batería</string>
+     <string name="launch_by_default" msgid="1840761193189009248">"Abrir de forma predeterminada"</string>
+     <string name="storage_summary_format" msgid="5419902362347539755">"<xliff:g id="SIZE">%1$s</xliff:g> usado en <xliff:g id="STORAGE_TYPE">%2$s</xliff:g>"</string>
+     <string name="app_launch_domain_links_title" msgid="6789955009107320092">"Vínculos de aplicaciones"</string>
+diff --git a/alps/packages/apps/Settings/res/values-es/strings.xml b/alps/packages/apps/Settings/res/values-es/strings.xml
+index 84bbef2..a201b86 100755
+--- a/alps/packages/apps/Settings/res/values-es/strings.xml
++++ b/alps/packages/apps/Settings/res/values-es/strings.xml
+@@ -2685,6 +2685,7 @@
+     <string name="imei_information_title" msgid="8499085421609752290">"Información del IMEI"</string>
+     <string name="imei_information_summary" msgid="2074095606556565233">"Información relacionada con el IMEI"</string>
+     <string name="slot_number" msgid="3762676044904653577">"(N.º <xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
++    <string name="battery_percent">Porcentaje de batería</string>
+     <string name="launch_by_default" msgid="1840761193189009248">"Abrir de forma predeterminada"</string>
+     <string name="storage_summary_format" msgid="5419902362347539755">"<xliff:g id="SIZE">%1$s</xliff:g> usados en <xliff:g id="STORAGE_TYPE">%2$s</xliff:g>"</string>
+     <string name="app_launch_domain_links_title" msgid="6789955009107320092">"Enlaces de aplicaciones"</string>
+diff --git a/alps/packages/apps/Settings/res/values-fa/strings.xml b/alps/packages/apps/Settings/res/values-fa/strings.xml
+old mode 100644
+new mode 100755
+index 2d1b0d5..f93fbe8
+--- a/alps/packages/apps/Settings/res/values-fa/strings.xml
++++ b/alps/packages/apps/Settings/res/values-fa/strings.xml
+@@ -2685,6 +2685,7 @@
+     <string name="imei_information_title" msgid="8499085421609752290">"‏اطلاعات IMEI"</string>
+     <string name="imei_information_summary" msgid="2074095606556565233">"‏اطلاعات مربوط به IMEI"</string>
+     <string name="slot_number" msgid="3762676044904653577">"(شکاف<xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
++    <string name="battery_percent">درصد باتری</string>
+     <string name="launch_by_default" msgid="1840761193189009248">"باز کردن به صورت پیش‌فرض"</string>
+     <string name="storage_summary_format" msgid="5419902362347539755">"<xliff:g id="SIZE">%1$s</xliff:g> استفاده شده در <xliff:g id="STORAGE_TYPE">%2$s</xliff:g>"</string>
+     <string name="app_launch_domain_links_title" msgid="6789955009107320092">"پیوندهای برنامه"</string>
+diff --git a/alps/packages/apps/Settings/res/values-fr/strings.xml b/alps/packages/apps/Settings/res/values-fr/strings.xml
+old mode 100644
+new mode 100755
+index 180b815..8b2b3d4
+--- a/alps/packages/apps/Settings/res/values-fr/strings.xml
++++ b/alps/packages/apps/Settings/res/values-fr/strings.xml
+@@ -2685,6 +2685,7 @@
+     <string name="imei_information_title" msgid="8499085421609752290">"Informations sur le code IMEI"</string>
+     <string name="imei_information_summary" msgid="2074095606556565233">"Informations relatives au code IMEI"</string>
+     <string name="slot_number" msgid="3762676044904653577">"(Emplacement <xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
++    <string name="battery_percent">Pourcentage pile</string>
+     <string name="launch_by_default" msgid="1840761193189009248">"Ouvrir par défaut"</string>
+     <string name="storage_summary_format" msgid="5419902362347539755">"Utilisation de la <xliff:g id="STORAGE_TYPE">%2$s</xliff:g> : <xliff:g id="SIZE">%1$s</xliff:g>"</string>
+     <string name="app_launch_domain_links_title" msgid="6789955009107320092">"Liens des applications"</string>
+diff --git a/alps/packages/apps/Settings/res/values-hr/strings.xml b/alps/packages/apps/Settings/res/values-hr/strings.xml
+old mode 100644
+new mode 100755
+index fc7b93c..a0a12fb
+--- a/alps/packages/apps/Settings/res/values-hr/strings.xml
++++ b/alps/packages/apps/Settings/res/values-hr/strings.xml
+@@ -2697,6 +2697,7 @@
+     <string name="imei_information_title" msgid="8499085421609752290">"Informacije IMEI-ja"</string>
+     <string name="imei_information_summary" msgid="2074095606556565233">"Relativne informacije IMEI-ja"</string>
+     <string name="slot_number" msgid="3762676044904653577">"(Utor <xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
++    <string name="battery_percent">Postotak baterije</string>
+     <string name="launch_by_default" msgid="1840761193189009248">"Otvori prema zadanim postavkama"</string>
+     <string name="storage_summary_format" msgid="5419902362347539755">"<xliff:g id="STORAGE_TYPE">%2$s</xliff:g>, iskorišteno <xliff:g id="SIZE">%1$s</xliff:g>"</string>
+     <string name="app_launch_domain_links_title" msgid="6789955009107320092">"Veze aplikacije"</string>
+diff --git a/alps/packages/apps/Settings/res/values-hu/strings.xml b/alps/packages/apps/Settings/res/values-hu/strings.xml
+old mode 100644
+new mode 100755
+index 501aa42..cd01ee8
+--- a/alps/packages/apps/Settings/res/values-hu/strings.xml
++++ b/alps/packages/apps/Settings/res/values-hu/strings.xml
+@@ -2685,6 +2685,7 @@
+     <string name="imei_information_title" msgid="8499085421609752290">"IMEI-információ"</string>
+     <string name="imei_information_summary" msgid="2074095606556565233">"Relatív IMEI-információ"</string>
+     <string name="slot_number" msgid="3762676044904653577">"(Hely: <xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
++    <string name="battery_percent">Akkumulátor százalék</string>
+     <string name="launch_by_default" msgid="1840761193189009248">"Megnyitás alapértelmezés szerint"</string>
+     <string name="storage_summary_format" msgid="5419902362347539755">"<xliff:g id="SIZE">%1$s</xliff:g> felhasználva itt: <xliff:g id="STORAGE_TYPE">%2$s</xliff:g>"</string>
+     <string name="app_launch_domain_links_title" msgid="6789955009107320092">"Alkalmazáslinkek"</string>
+diff --git a/alps/packages/apps/Settings/res/values-iw/strings.xml b/alps/packages/apps/Settings/res/values-iw/strings.xml
+old mode 100644
+new mode 100755
+index 7175c32..b8d5d74
+--- a/alps/packages/apps/Settings/res/values-iw/strings.xml
++++ b/alps/packages/apps/Settings/res/values-iw/strings.xml
+@@ -2709,6 +2709,7 @@
+     <string name="imei_information_title" msgid="8499085421609752290">"‏פרטי IMEI"</string>
+     <string name="imei_information_summary" msgid="2074095606556565233">"‏מידע הקשור ל-IMEI"</string>
+     <string name="slot_number" msgid="3762676044904653577">"(חריץ <xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
++    <string name="battery_percent">אחוז טעינה של הסוללה</string>
+     <string name="launch_by_default" msgid="1840761193189009248">"פתח כברירת מחדל"</string>
+     <string name="storage_summary_format" msgid="5419902362347539755">"נעשה שימוש ב-<xliff:g id="SIZE">%1$s</xliff:g> ב<xliff:g id="STORAGE_TYPE">%2$s</xliff:g>"</string>
+     <string name="app_launch_domain_links_title" msgid="6789955009107320092">"קישורים של אפליקציה"</string>
+diff --git a/alps/packages/apps/Settings/res/values-nl/strings.xml b/alps/packages/apps/Settings/res/values-nl/strings.xml
+old mode 100644
+new mode 100755
+index 89f9ffa..189f1c8
+--- a/alps/packages/apps/Settings/res/values-nl/strings.xml
++++ b/alps/packages/apps/Settings/res/values-nl/strings.xml
+@@ -2685,6 +2685,7 @@
+     <string name="imei_information_title" msgid="8499085421609752290">"IMEI-informatie"</string>
+     <string name="imei_information_summary" msgid="2074095606556565233">"Relatieve IMEI-informatie"</string>
+     <string name="slot_number" msgid="3762676044904653577">"(Positie <xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
++    <string name="battery_percent">Batterijlading</string>
+     <string name="launch_by_default" msgid="1840761193189009248">"Standaard openen"</string>
+     <string name="storage_summary_format" msgid="5419902362347539755">"<xliff:g id="SIZE">%1$s</xliff:g> gebruikt in <xliff:g id="STORAGE_TYPE">%2$s</xliff:g>"</string>
+     <string name="app_launch_domain_links_title" msgid="6789955009107320092">"App-links"</string>
+diff --git a/alps/packages/apps/Settings/res/values-pl/strings.xml b/alps/packages/apps/Settings/res/values-pl/strings.xml
+old mode 100644
+new mode 100755
+index 46a7716..90e24a1
+--- a/alps/packages/apps/Settings/res/values-pl/strings.xml
++++ b/alps/packages/apps/Settings/res/values-pl/strings.xml
+@@ -2709,6 +2709,7 @@
+     <string name="imei_information_title" msgid="8499085421609752290">"Informacje o IMEI"</string>
+     <string name="imei_information_summary" msgid="2074095606556565233">"Informacje związane z IMEI"</string>
+     <string name="slot_number" msgid="3762676044904653577">"(Gniazdo <xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
++    <string name="battery_percent">Procent baterii</string>
+     <string name="launch_by_default" msgid="1840761193189009248">"Otwórz domyślnie"</string>
+     <string name="storage_summary_format" msgid="5419902362347539755">"<xliff:g id="SIZE">%1$s</xliff:g> wykorzystane w: <xliff:g id="STORAGE_TYPE">%2$s</xliff:g>"</string>
+     <string name="app_launch_domain_links_title" msgid="6789955009107320092">"Linki aplikacji"</string>
+diff --git a/alps/packages/apps/Settings/res/values-pt-rPT/strings.xml b/alps/packages/apps/Settings/res/values-pt-rPT/strings.xml
+index e659876..b534047 100755
+--- a/alps/packages/apps/Settings/res/values-pt-rPT/strings.xml
++++ b/alps/packages/apps/Settings/res/values-pt-rPT/strings.xml
+@@ -2685,6 +2685,7 @@
+     <string name="imei_information_title" msgid="8499085421609752290">"Informações do IMEI"</string>
+     <string name="imei_information_summary" msgid="2074095606556565233">"Informações relativas do IMEI"</string>
+     <string name="slot_number" msgid="3762676044904653577">"(Slot<xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
++    <string name="battery_percent">Percentagem da bateria</string>
+     <string name="launch_by_default" msgid="1840761193189009248">"Abrir por predefinição"</string>
+     <string name="storage_summary_format" msgid="5419902362347539755">"<xliff:g id="SIZE">%1$s</xliff:g> utilizados em <xliff:g id="STORAGE_TYPE">%2$s</xliff:g>"</string>
+     <string name="app_launch_domain_links_title" msgid="6789955009107320092">"Links da aplicação"</string>
+diff --git a/alps/packages/apps/Settings/res/values-pt/strings.xml b/alps/packages/apps/Settings/res/values-pt/strings.xml
+index cc4c145..db4143f 100755
+--- a/alps/packages/apps/Settings/res/values-pt/strings.xml
++++ b/alps/packages/apps/Settings/res/values-pt/strings.xml
+@@ -2685,6 +2685,7 @@
+     <string name="imei_information_title" msgid="8499085421609752290">"Informações de IMEI"</string>
+     <string name="imei_information_summary" msgid="2074095606556565233">"Informações relativas de IMEI"</string>
+     <string name="slot_number" msgid="3762676044904653577">"(Slot<xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
++    <string name="battery_percent">Porcentagem da Bateria</string>
+     <string name="launch_by_default" msgid="1840761193189009248">"Abrir por padrão"</string>
+     <string name="storage_summary_format" msgid="5419902362347539755">"<xliff:g id="SIZE">%1$s</xliff:g> usados em <xliff:g id="STORAGE_TYPE">%2$s</xliff:g>"</string>
+     <string name="app_launch_domain_links_title" msgid="6789955009107320092">"Links do app"</string>
+diff --git a/alps/packages/apps/Settings/res/values-ru/strings.xml b/alps/packages/apps/Settings/res/values-ru/strings.xml
+old mode 100644
+new mode 100755
+index 43b5c3e..8f56aa7
+--- a/alps/packages/apps/Settings/res/values-ru/strings.xml
++++ b/alps/packages/apps/Settings/res/values-ru/strings.xml
+@@ -2709,6 +2709,7 @@
+     <string name="imei_information_title" msgid="8499085421609752290">"Данные IMEI-кода"</string>
+     <string name="imei_information_summary" msgid="2074095606556565233">"Сведения, касающиеся IMEI-кода"</string>
+     <string name="slot_number" msgid="3762676044904653577">"(разъем <xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
++    <string name="battery_percent">Заряд батареи</string>
+     <string name="launch_by_default" msgid="1840761193189009248">"Открывать по умолчанию"</string>
+     <string name="storage_summary_format" msgid="5419902362347539755">"Занято <xliff:g id="SIZE">%1$s</xliff:g> (<xliff:g id="STORAGE_TYPE">%2$s</xliff:g>)"</string>
+     <string name="app_launch_domain_links_title" msgid="6789955009107320092">"Ссылки в приложениях"</string>
+diff --git a/alps/packages/apps/Settings/res/values-vi/strings.xml b/alps/packages/apps/Settings/res/values-vi/strings.xml
+old mode 100644
+new mode 100755
+index afe6e24..23bbf64
+--- a/alps/packages/apps/Settings/res/values-vi/strings.xml
++++ b/alps/packages/apps/Settings/res/values-vi/strings.xml
+@@ -2685,6 +2685,7 @@
+     <string name="imei_information_title" msgid="8499085421609752290">"Thông tin IMEI"</string>
+     <string name="imei_information_summary" msgid="2074095606556565233">"Thông tin liên quan đến IMEI"</string>
+     <string name="slot_number" msgid="3762676044904653577">"(Khe cắm<xliff:g id="SLOT_NUM">%1$d</xliff:g>)"</string>
++    <string name="battery_percent">Tỷ lệ pin</string>
+     <string name="launch_by_default" msgid="1840761193189009248">"Mở theo mặc định"</string>
+     <string name="storage_summary_format" msgid="5419902362347539755">"<xliff:g id="SIZE">%1$s</xliff:g> đã được sử dụng trong <xliff:g id="STORAGE_TYPE">%2$s</xliff:g>"</string>
+     <string name="app_launch_domain_links_title" msgid="6789955009107320092">"Liên kết ứng dụng"</string>
+diff --git a/alps/packages/apps/Settings/res/values-zh-rCN/strings.xml b/alps/packages/apps/Settings/res/values-zh-rCN/strings.xml
+old mode 100644
+new mode 100755
+index 94e27ea..c9265f5
+--- a/alps/packages/apps/Settings/res/values-zh-rCN/strings.xml
++++ b/alps/packages/apps/Settings/res/values-zh-rCN/strings.xml
+@@ -2685,6 +2685,7 @@
+     <string name="imei_information_title" msgid="8499085421609752290">"IMEI信息"</string>
+     <string name="imei_information_summary" msgid="2074095606556565233">"IMEI相关信息"</string>
+     <string name="slot_number" msgid="3762676044904653577">"（插槽<xliff:g id="SLOT_NUM">%1$d</xliff:g>）"</string>
++    <string name="battery_percent">电量百分比</string>
+     <string name="launch_by_default" msgid="1840761193189009248">"默认打开"</string>
+     <string name="storage_summary_format" msgid="5419902362347539755">"<xliff:g id="STORAGE_TYPE">%2$s</xliff:g>已使用 <xliff:g id="SIZE">%1$s</xliff:g>"</string>
+     <string name="app_launch_domain_links_title" msgid="6789955009107320092">"应用链接"</string>
+diff --git a/alps/packages/apps/Settings/res/values/strings.xml b/alps/packages/apps/Settings/res/values/strings.xml
+index 24246ff..0f1d77a 100755
+--- a/alps/packages/apps/Settings/res/values/strings.xml
++++ b/alps/packages/apps/Settings/res/values/strings.xml
+@@ -6473,6 +6473,8 @@
+    <string name="imei_information_title">IMEI information</string>
+    <string name="imei_information_summary">IMEI relative information</string>
+    <string name="slot_number">(Slot<xliff:g id="slot_num">%1$d</xliff:g>)</string>
++   
++   <string name="battery_percent">Battery Percentage</string>
+ 
+    <!-- New strings needed for App Info 2 -->
+    <!-- Preference label for app default launch settings [CHAR LIMIT=35]-->
+diff --git a/alps/packages/apps/Settings/src/com/android/settings/fuelgauge/PowerUsageSummary.java b/alps/packages/apps/Settings/src/com/android/settings/fuelgauge/PowerUsageSummary.java
+old mode 100644
+new mode 100755
+index 0aa59d8..b922614
+--- a/alps/packages/apps/Settings/src/com/android/settings/fuelgauge/PowerUsageSummary.java
++++ b/alps/packages/apps/Settings/src/com/android/settings/fuelgauge/PowerUsageSummary.java
+@@ -108,12 +108,14 @@ public class PowerUsageSummary extends PowerUsageBase {
+     public void onResume() {
+         super.onResume();
+         refreshStats();
++        mPowerUsageExts.registerSmartBookReceiver();//tianyunfei 20150908 add for show battery percentage in status bar
+     }
+ 
+     @Override
+     public void onPause() {
+         BatteryEntry.stopRequestQueue();
+         mHandler.removeMessages(BatteryEntry.MSG_UPDATE_NAME_ICON);
++        mPowerUsageExts.unRegisterSmartBookReceiver();//tianyunfei 20150908 add for show battery percentage in status bar
+         super.onPause();
+     }
+ 
+diff --git a/alps/packages/apps/Settings/src/com/mediatek/settings/fuelgauge/PowerUsageExts.java b/alps/packages/apps/Settings/src/com/mediatek/settings/fuelgauge/PowerUsageExts.java
+index ab83d20..963182b 100755
+--- a/alps/packages/apps/Settings/src/com/mediatek/settings/fuelgauge/PowerUsageExts.java
++++ b/alps/packages/apps/Settings/src/com/mediatek/settings/fuelgauge/PowerUsageExts.java
+@@ -10,6 +10,16 @@ import android.util.Log;
+ import com.android.settings.R;
+ import com.mediatek.settings.FeatureOption;
+ 
++/*tianyunfei 20150908 add for show battery percentage in status bar begin*/
++import android.preference.CheckBoxPreference;
++import android.hardware.display.DisplayManager;
++import android.content.BroadcastReceiver;
++import android.content.Intent;
++import android.content.IntentFilter;
++import android.os.UserHandle;
++/*tianyunfei 20150908 add for show battery percentage in status bar end*/
++
++
+ public class PowerUsageExts {
+ 
+     private static final String TAG = "PowerUsageSummary";
+@@ -21,11 +31,52 @@ public class PowerUsageExts {
+     private Context mContext;
+     private PreferenceScreen mPowerUsageScreen;
+     private SwitchPreference mBgPowerSavingPrf;
++    
++    /*tianyunfei 20150908 add for show battery percentage in status bar begin*/
++    private static final String ACTION_BATTERY_PERCENTAGE_SWITCH = "mediatek.intent.action.BATTERY_PERCENTAGE_SWITCH";
++    private static final String KEY_BATTERY_PERCENTAGE = "battery_percentage";
++    private CheckBoxPreference mBatterrPercentPrf;
++    /*tianyunfei 20150908 add for show battery percentage in status bar end*/
+ 
+     public PowerUsageExts(Context context, PreferenceScreen appListGroup) {
+         mContext = context;
+         mPowerUsageScreen = appListGroup;
+     }
++    
++    /*tianyunfei 20150908 add for show battery percentage in status bar begin*/
++    private BroadcastReceiver mSmartBookPlugReceiver = new BroadcastReceiver() {
++        @Override
++        public void onReceive(Context context1, Intent intent) {
++            // update the UI
++            setBatteryPercenVisibility();
++        }
++    };
++
++    /*
++     * if has smart book plug in, battery percentage item should gone
++     */
++    private void setBatteryPercenVisibility() {
++        DisplayManager displayManager = (DisplayManager) mContext.getSystemService(Context.DISPLAY_SERVICE);
++        boolean isSmartBookPluggedIn = displayManager.isSmartBookPluggedIn();
++        Log.d(TAG, "[BP]--smartbook plug:" + isSmartBookPluggedIn);
++        if (isSmartBookPluggedIn) {
++            mAppListGroup.removePreference(mBatterrPercentPrf);
++        } else {
++            mAppListGroup.addPreference(mBatterrPercentPrf);
++        }
++    }
++
++    public void registerSmartBookReceiver() {
++        // Register the receiver: Smart book plug in/out intent
++        mContext.registerReceiver(mSmartBookPlugReceiver, new IntentFilter(Intent.ACTION_SMARTBOOK_PLUG));
++    }
++
++    public void unRegisterSmartBookReceiver() {
++        // Unregister the receiver: Smart book plug in/out intent
++        mContext.unregisterReceiver(mSmartBookPlugReceiver);
++    }
++    /*tianyunfei 20150908 add for show battery percentage in status bar end*/
++
+ 
+     // init power usage extends items
+     public void initPowerUsageExtItems() {
+@@ -40,6 +91,17 @@ public class PowerUsageExts {
+                     Settings.System.BG_POWER_SAVING_ENABLE, 1) != 0);
+             mPowerUsageScreen.addPreference(mBgPowerSavingPrf);
+         }
++        /*tianyunfei 20150908 add for show battery percentage in status bar begin*/ 
++       mBatterrPercentPrf = new CheckBoxPreference(mContext);
++       mBatterrPercentPrf.setKey(KEY_BATTERY_PERCENTAGE);
++       mBatterrPercentPrf.setTitle(mContext.getString(R.string.battery_percent));
++       mBatterrPercentPrf.setOrder(-5);
++       final boolean enable = Settings.Secure.getInt(mContext.getContentResolver(),
++               Settings.Secure.BATTERY_PERCENTAGE, 0) != 0;
++       mBatterrPercentPrf.setChecked(enable);
++       mAppListGroup.addPreference(mBatterrPercentPrf);
++       setBatteryPercenVisibility();
++       /*tianyunfei 20150908 add for show battery percentage in status bar end*/
+     }
+ 
+     // on click
+@@ -59,6 +121,26 @@ public class PowerUsageExts {
+             // If user click on PowerSaving preference just return here
+             return true;
+         }
++        /*tianyunfei 20150908 add for show battery percentage in status bar begin*/ 
++        else if (KEY_BATTERY_PERCENTAGE.equals(preference.getKey())) {
++            if (preference instanceof CheckBoxPreference) {
++                     CheckBoxPreference pref = (CheckBoxPreference) preference;
++                     int state = pref.isChecked() ? 1 : 0;
++                     Log.d(TAG, "[BP]--battery percentage state: " + state);
++                     Settings.Secure.putInt(mContext.getContentResolver(), Settings.Secure.BATTERY_PERCENTAGE, state);
++                     // Post the intent
++                     Intent intent = new Intent(ACTION_BATTERY_PERCENTAGE_SWITCH);
++                     intent.putExtra("state", state);
++                     // { @: ALPS01292477
++                      if (mBatterrPercentPrf != null) {
++                          mBatterrPercentPrf.setChecked(pref.isChecked());
++                      } // @ }
++                       // @ CR: ALPS00462531 for multi user
++                       mContext.sendBroadcastAsUser(intent, UserHandle.ALL);
++            }
++            return true;
++        }
++        /*tianyunfei 20150908 add for show battery percentage in status bar end*/ 
+         return false;
+     }
+ }
+-- 
+2.3.7
+

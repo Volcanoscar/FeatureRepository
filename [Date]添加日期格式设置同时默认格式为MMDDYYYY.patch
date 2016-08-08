@@ -1,0 +1,729 @@
+From 4b16ffaf451532a3c5b1aa070b803e109983ff6d Mon Sep 17 00:00:00 2001
+From: hetian <hetian@hkzechin.com>
+Date: Fri, 11 Mar 2016 22:59:21 +0800
+Subject: [PATCH] =?UTF-8?q?[BLU][Date]=E6=B7=BB=E5=8A=A0=E6=97=A5=E6=9C=9F?=
+ =?UTF-8?q?=E6=A0=BC=E5=BC=8F=E8=AE=BE=E7=BD=AE=E5=90=8C=E6=97=B6=E9=BB=98?=
+ =?UTF-8?q?=E8=AE=A4=E6=A0=BC=E5=BC=8F=E4=B8=BAMM/DD/YYYY?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ alps/frameworks/base/api/current.txt               |   1 +
+ alps/frameworks/base/api/system-current.txt        |   1 +
+ .../core/java/android/text/format/DateFormat.java  | 112 +++++++++++++++++++++
+ .../res/res/values-en-rGB/donottranslate-cldr.xml  |   1 +
+ .../res/res/values-en-rUS/donottranslate-cldr.xml  |   1 +
+ .../res/res/values-es-rUS/donottranslate-cldr.xml  |   1 +
+ .../core/res/res/values-es/donottranslate-cldr.xml |   1 +
+ .../core/res/res/values-fr/donottranslate-cldr.xml |   1 +
+ .../res/res/values-pt-rPT/donottranslate-cldr.xml  |   1 +
+ .../core/res/res/values-pt/donottranslate-cldr.xml |   1 +
+ .../res/res/values-zh-rCN/donottranslate-cldr.xml  |   1 +
+ .../res/res/values-zh-rTW/donottranslate-cldr.xml  |   1 +
+ .../core/res/res/values/donottranslate-cldr.xml    |   1 +
+ .../base/core/res/res/values/symbols.xml           |   1 +
+ .../Keyguard/res/layout/keyguard_status_area.xml   |   2 +-
+ .../com/android/keyguard/KeyguardStatusView.java   |  15 ++-
+ .../SettingsProvider/res/values/defaults.xml       |   4 +
+ .../android/providers/settings/DatabaseHelper.java |   4 +
+ .../systemui/statusbar/policy/DateView.java        |   6 +-
+ .../com/android/vcard/VCardEntryCommitter.java     |   2 +-
+ .../apps/Settings/res/values-es-rUS/strings.xml    |   2 +
+ .../apps/Settings/res/values-es/strings.xml        |   2 +
+ .../apps/Settings/res/values-pt-rPT/strings.xml    |   2 +
+ .../apps/Settings/res/values-pt/strings.xml        |   2 +
+ .../apps/Settings/res/values-zh-rCN/strings.xml    |   2 +
+ alps/packages/apps/Settings/res/values/arrays.xml  |  12 +++
+ alps/packages/apps/Settings/res/values/strings.xml |   3 +
+ .../apps/Settings/res/xml/date_time_prefs.xml      |   5 +-
+ .../src/com/android/settings/DateTimeSettings.java |  72 ++++++++++++-
+ 29 files changed, 245 insertions(+), 15 deletions(-)
+ mode change 100644 => 100755 alps/frameworks/base/core/res/res/values/symbols.xml
+ mode change 100644 => 100755 alps/frameworks/base/packages/Keyguard/res/layout/keyguard_status_area.xml
+ mode change 100644 => 100755 alps/frameworks/base/packages/Keyguard/src/com/android/keyguard/KeyguardStatusView.java
+ mode change 100644 => 100755 alps/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/policy/DateView.java
+ mode change 100644 => 100755 alps/frameworks/opt/vcard/java/com/android/vcard/VCardEntryCommitter.java
+ mode change 100644 => 100755 alps/packages/apps/Settings/res/values-es-rUS/strings.xml
+ mode change 100644 => 100755 alps/packages/apps/Settings/res/values-zh-rCN/strings.xml
+ mode change 100644 => 100755 alps/packages/apps/Settings/res/values/arrays.xml
+ mode change 100644 => 100755 alps/packages/apps/Settings/res/xml/date_time_prefs.xml
+ mode change 100644 => 100755 alps/packages/apps/Settings/src/com/android/settings/DateTimeSettings.java
+
+diff --git a/alps/frameworks/base/api/current.txt b/alps/frameworks/base/api/current.txt
+index d7fdb2d..d23c46a 100644
+--- a/alps/frameworks/base/api/current.txt
++++ b/alps/frameworks/base/api/current.txt
+@@ -32521,6 +32521,7 @@ package android.text.format {
+     method public static java.lang.CharSequence format(java.lang.CharSequence, java.util.Calendar);
+     method public static java.lang.String getBestDateTimePattern(java.util.Locale, java.lang.String);
+     method public static java.text.DateFormat getDateFormat(android.content.Context);
++    method public static java.text.DateFormat getDateFormatForSetting(android.content.Context, java.lang.String);
+     method public static char[] getDateFormatOrder(android.content.Context);
+     method public static java.text.DateFormat getLongDateFormat(android.content.Context);
+     method public static java.text.DateFormat getMediumDateFormat(android.content.Context);
+diff --git a/alps/frameworks/base/api/system-current.txt b/alps/frameworks/base/api/system-current.txt
+index 3c88e59..193bd36 100644
+--- a/alps/frameworks/base/api/system-current.txt
++++ b/alps/frameworks/base/api/system-current.txt
+@@ -34813,6 +34813,7 @@ package android.text.format {
+     method public static java.lang.CharSequence format(java.lang.CharSequence, java.util.Calendar);
+     method public static java.lang.String getBestDateTimePattern(java.util.Locale, java.lang.String);
+     method public static java.text.DateFormat getDateFormat(android.content.Context);
++    method public static java.text.DateFormat getDateFormatForSetting(android.content.Context, java.lang.String);
+     method public static char[] getDateFormatOrder(android.content.Context);
+     method public static java.text.DateFormat getLongDateFormat(android.content.Context);
+     method public static java.text.DateFormat getMediumDateFormat(android.content.Context);
+diff --git a/alps/frameworks/base/core/java/android/text/format/DateFormat.java b/alps/frameworks/base/core/java/android/text/format/DateFormat.java
+index 8d5555d..c52b84d 100755
+--- a/alps/frameworks/base/core/java/android/text/format/DateFormat.java
++++ b/alps/frameworks/base/core/java/android/text/format/DateFormat.java
+@@ -28,6 +28,8 @@ import android.text.SpannableStringBuilder;
+ import android.text.Spanned;
+ import android.text.SpannedString;
+ 
++import com.android.internal.R;
++
+ import java.util.Calendar;
+ import java.util.Date;
+ import java.util.GregorianCalendar;
+@@ -636,4 +638,114 @@ public class DateFormat {
+     private static String zeroPad(int inValue, int inMinDigits) {
+         return String.format(Locale.getDefault(), "%0" + inMinDigits + "d", inValue);
+     }
++    
++    /*hetian add*/
++    public static java.text.DateFormat getDateFormatForSetting(Context context,
++                                                               String value) {
++        String format = getDateFormatStringForSetting(context, value);
++        return new java.text.SimpleDateFormat(format);
++    }
++
++    private static String getDateFormatStringForSetting(Context context, String value) {
++        String result = null;
++        if (value != null) {
++            /// M: add week and arrange month day year according to resource's date format defination for settings. CR: ALPS00049014 @{
++            String dayValue = value.indexOf("dd") < 0 ? "d" : "dd";
++            String monthValue = value.indexOf("MMMM") < 0 ? (value.indexOf("MMM") < 0 ? (value.indexOf("MM") < 0 ? "M" : "MM") : "MMM") : "MMMM";
++            String yearValue = value.indexOf("yyyy") < 0 ? "y" : "yyyy";
++            String weekValue = value.indexOf("EEEE") < 0 ? "E" : "EEEE";
++
++            int day = value.indexOf(dayValue);
++            int month = value.indexOf(monthValue);
++            int year = value.indexOf(yearValue);
++            int week = value.indexOf(weekValue);
++
++            if (week >= 0 && month >= 0 && day >= 0 && year >= 0) {
++                String template = null;
++                if (week < day) {
++                    if (year < month && year < day) {
++                        if (month < day) {
++                            template = context.getString(com.mediatek.internal.R.string.wday_year_month_day);
++                            result = String.format(template, weekValue, yearValue, monthValue, dayValue);
++                        } else {
++                            template = context.getString(com.mediatek.internal.R.string.wday_year_day_month);
++                            result = String.format(template, weekValue, yearValue, dayValue, monthValue);
++                        }
++                    } else if (month < day) {
++                        if (day < year) {
++                            template = context.getString(com.mediatek.internal.R.string.wday_month_day_year);
++                            result = String.format(template, weekValue, monthValue, dayValue, yearValue);
++                        } else {
++                            template = context.getString(com.mediatek.internal.R.string.wday_month_year_day);
++                            result = String.format(template, weekValue, monthValue, yearValue, dayValue);
++                        }
++                    } else {
++                        if (month < year) {
++                            template = context.getString(com.mediatek.internal.R.string.wday_day_month_year);
++                            result = String.format(template, weekValue, dayValue, monthValue, yearValue);
++                        } else {
++                            template = context.getString(com.mediatek.internal.R.string.wday_day_year_month);
++                            result = String.format(template, weekValue, dayValue, yearValue, monthValue);
++                        }
++                    }
++                } else {
++                    if (year < month && year < day) {
++                        if (month < day) {
++                            template = context.getString(com.mediatek.internal.R.string.year_month_day_wday);
++                            result = String.format(template, yearValue, monthValue, dayValue, weekValue);
++                        } else {
++                            template = context.getString(com.mediatek.internal.R.string.year_day_month_wday);
++                            result = String.format(template, yearValue, dayValue, monthValue, weekValue);
++                        }
++                    } else if (month < day) {
++                        if (day < year) {
++                            template = context.getString(com.mediatek.internal.R.string.month_day_year_wday);
++                            result = String.format(template, monthValue, dayValue, yearValue, weekValue);
++                        } else {
++                            template = context.getString(com.mediatek.internal.R.string.month_year_day_wday);
++                            result = String.format(template, monthValue, yearValue, dayValue, weekValue);
++                        }
++                    } else {
++                        if (month < year) {
++                            template = context.getString(com.mediatek.internal.R.string.day_month_year_wday);
++                            result = String.format(template, dayValue, monthValue, yearValue, weekValue);
++                        } else {
++                            template = context.getString(com.mediatek.internal.R.string.day_year_month_wday);
++                            result = String.format(template, dayValue, yearValue, monthValue, weekValue);
++                        }
++                    }
++                }
++
++                return result;
++            /// M: @}
++            } else if (month >= 0 && day >= 0 && year >= 0) {
++                String template = context.getString(R.string.numeric_date_template);
++                if (year < month && year < day) {
++                    if (month < day) {
++                        result = String.format(template, yearValue, monthValue, dayValue);
++                    } else {
++                        result = String.format(template, yearValue, dayValue, monthValue);
++                    }
++                } else if (month < day) {
++                    if (day < year) {
++                        result = String.format(template, monthValue, dayValue, yearValue);
++                    } else { // unlikely
++                        result = String.format(template, monthValue, yearValue, dayValue);
++                    }
++                } else { // date < month
++                    if (month < year) {
++                        result = String.format(template, dayValue, monthValue, yearValue);
++                    } else { // unlikely
++                        result = String.format(template, dayValue, yearValue, monthValue);
++                    }
++                }
++
++                return result;
++            }
++        }
++
++        // The setting is not set; use the locale's default.
++        LocaleData d = LocaleData.get(context.getResources().getConfiguration().locale);
++        return d.shortDateFormat4;
++    }
+ }
+diff --git a/alps/frameworks/base/core/res/res/values-en-rGB/donottranslate-cldr.xml b/alps/frameworks/base/core/res/res/values-en-rGB/donottranslate-cldr.xml
+index db438f2..04144a9 100755
+--- a/alps/frameworks/base/core/res/res/values-en-rGB/donottranslate-cldr.xml
++++ b/alps/frameworks/base/core/res/res/values-en-rGB/donottranslate-cldr.xml
+@@ -5,4 +5,5 @@
+     <string name="time_of_day">%H:%M:%S</string>
+     <string name="date_and_time">%-e %b %Y, %H:%M:%S</string>
+     <string name="date_time">%1$s, %2$s</string>
++    <string name="numeric_date_template">"%s/%s/%s"</string>
+ </resources>
+diff --git a/alps/frameworks/base/core/res/res/values-en-rUS/donottranslate-cldr.xml b/alps/frameworks/base/core/res/res/values-en-rUS/donottranslate-cldr.xml
+index a8e2b2b..444c60b 100755
+--- a/alps/frameworks/base/core/res/res/values-en-rUS/donottranslate-cldr.xml
++++ b/alps/frameworks/base/core/res/res/values-en-rUS/donottranslate-cldr.xml
+@@ -5,4 +5,5 @@
+     <string name="time_of_day">%-l:%M:%S %p</string>
+     <string name="date_and_time">%b %-e, %Y, %-l:%M:%S %p</string>
+     <string name="date_time">%1$s, %2$s</string>
++    <string name="numeric_date_template">"%s/%s/%s"</string>
+ </resources>
+diff --git a/alps/frameworks/base/core/res/res/values-es-rUS/donottranslate-cldr.xml b/alps/frameworks/base/core/res/res/values-es-rUS/donottranslate-cldr.xml
+index 8adac31..ad38625 100755
+--- a/alps/frameworks/base/core/res/res/values-es-rUS/donottranslate-cldr.xml
++++ b/alps/frameworks/base/core/res/res/values-es-rUS/donottranslate-cldr.xml
+@@ -5,4 +5,5 @@
+     <string name="time_of_day">%-l:%M:%S %p</string>
+     <string name="date_and_time">%-l:%M:%S %p %b %-e, %Y</string>
+     <string name="date_time">%2$s %1$s</string>
++    <string name="numeric_date_template">"%s/%s/%s"</string>
+ </resources>
+diff --git a/alps/frameworks/base/core/res/res/values-es/donottranslate-cldr.xml b/alps/frameworks/base/core/res/res/values-es/donottranslate-cldr.xml
+index ca16aa0..f56640a 100755
+--- a/alps/frameworks/base/core/res/res/values-es/donottranslate-cldr.xml
++++ b/alps/frameworks/base/core/res/res/values-es/donottranslate-cldr.xml
+@@ -5,4 +5,5 @@
+     <string name="time_of_day">%H:%M:%S</string>
+     <string name="date_and_time">%d/%m/%Y, %H:%M:%S</string>
+     <string name="date_time">%1$s, %2$s</string>
++    <string name="numeric_date_template">"%s/%s/%s"</string>
+ </resources>
+diff --git a/alps/frameworks/base/core/res/res/values-fr/donottranslate-cldr.xml b/alps/frameworks/base/core/res/res/values-fr/donottranslate-cldr.xml
+index 2d6a109..c01c53a 100755
+--- a/alps/frameworks/base/core/res/res/values-fr/donottranslate-cldr.xml
++++ b/alps/frameworks/base/core/res/res/values-fr/donottranslate-cldr.xml
+@@ -5,4 +5,5 @@
+     <string name="time_of_day">%H:%M:%S</string>
+     <string name="date_and_time">%-e %b %Y √† %H:%M:%S</string>
+     <string name="date_time">%1$s √† %2$s</string>
++    <string name="numeric_date_template">"%s/%s/%s"</string>
+ </resources>
+diff --git a/alps/frameworks/base/core/res/res/values-pt-rPT/donottranslate-cldr.xml b/alps/frameworks/base/core/res/res/values-pt-rPT/donottranslate-cldr.xml
+index 6355432..2bd93f5 100755
+--- a/alps/frameworks/base/core/res/res/values-pt-rPT/donottranslate-cldr.xml
++++ b/alps/frameworks/base/core/res/res/values-pt-rPT/donottranslate-cldr.xml
+@@ -5,4 +5,5 @@
+     <string name="time_of_day">%H:%M:%S</string>
+     <string name="date_and_time">%H:%M:%S %-e de %b de %Y</string>
+     <string name="date_time">%2$s %1$s</string>
++    <string name="numeric_date_template">"%s/%s/%s"</string>
+ </resources>
+diff --git a/alps/frameworks/base/core/res/res/values-pt/donottranslate-cldr.xml b/alps/frameworks/base/core/res/res/values-pt/donottranslate-cldr.xml
+index c97b337..745b887 100755
+--- a/alps/frameworks/base/core/res/res/values-pt/donottranslate-cldr.xml
++++ b/alps/frameworks/base/core/res/res/values-pt/donottranslate-cldr.xml
+@@ -5,4 +5,5 @@
+     <string name="time_of_day">%H:%M:%S</string>
+     <string name="date_and_time">%H:%M:%S %d/%m/%Y</string>
+     <string name="date_time">%2$s %1$s</string>
++    <string name="numeric_date_template">"%s/%s/%s"</string>
+ </resources>
+diff --git a/alps/frameworks/base/core/res/res/values-zh-rCN/donottranslate-cldr.xml b/alps/frameworks/base/core/res/res/values-zh-rCN/donottranslate-cldr.xml
+index b3f009e..c693a2d 100755
+--- a/alps/frameworks/base/core/res/res/values-zh-rCN/donottranslate-cldr.xml
++++ b/alps/frameworks/base/core/res/res/values-zh-rCN/donottranslate-cldr.xml
+@@ -5,4 +5,5 @@
+     <string name="time_of_day">%p %I:%M:%S</string>
+     <string name="date_and_time">%Y Âπ¥ %-m Êúà %-e Êó•%p %I:%M:%S</string>
+     <string name="date_time">%1$s %2$s</string>
++    <string name="numeric_date_template">"%s-%s-%s"</string>
+ </resources>
+diff --git a/alps/frameworks/base/core/res/res/values-zh-rTW/donottranslate-cldr.xml b/alps/frameworks/base/core/res/res/values-zh-rTW/donottranslate-cldr.xml
+index 3e2b33d..51a5a39 100755
+--- a/alps/frameworks/base/core/res/res/values-zh-rTW/donottranslate-cldr.xml
++++ b/alps/frameworks/base/core/res/res/values-zh-rTW/donottranslate-cldr.xml
+@@ -5,4 +5,5 @@
+     <string name="time_of_day">%p %I:%M:%S</string>
+     <string name="date_and_time">%Y/%-m/%-e %p %I:%M:%S</string>
+     <string name="date_time">%1$s %2$s</string>
++    <string name="numeric_date_template">"%s/%s/%s"</string>
+ </resources>
+diff --git a/alps/frameworks/base/core/res/res/values/donottranslate-cldr.xml b/alps/frameworks/base/core/res/res/values/donottranslate-cldr.xml
+index a8e2b2b..444c60b 100755
+--- a/alps/frameworks/base/core/res/res/values/donottranslate-cldr.xml
++++ b/alps/frameworks/base/core/res/res/values/donottranslate-cldr.xml
+@@ -5,4 +5,5 @@
+     <string name="time_of_day">%-l:%M:%S %p</string>
+     <string name="date_and_time">%b %-e, %Y, %-l:%M:%S %p</string>
+     <string name="date_time">%1$s, %2$s</string>
++    <string name="numeric_date_template">"%s/%s/%s"</string>
+ </resources>
+diff --git a/alps/frameworks/base/core/res/res/values/symbols.xml b/alps/frameworks/base/core/res/res/values/symbols.xml
+old mode 100644
+new mode 100755
+index 35419e3..850cc94
+--- a/alps/frameworks/base/core/res/res/values/symbols.xml
++++ b/alps/frameworks/base/core/res/res/values/symbols.xml
+@@ -2319,5 +2319,6 @@
+   <java-symbol type="drawable" name="ic_more_items" />
+ 
+   <java-symbol type="drawable" name="platlogo_m" />
++  <java-symbol type="string" name="numeric_date_template" />
+ 
+ </resources>
+diff --git a/alps/frameworks/base/packages/Keyguard/res/layout/keyguard_status_area.xml b/alps/frameworks/base/packages/Keyguard/res/layout/keyguard_status_area.xml
+old mode 100644
+new mode 100755
+index 8fe2835..93869f1
+--- a/alps/frameworks/base/packages/Keyguard/res/layout/keyguard_status_area.xml
++++ b/alps/frameworks/base/packages/Keyguard/res/layout/keyguard_status_area.xml
+@@ -25,7 +25,7 @@
+     android:layout_height="wrap_content"
+     android:orientation="horizontal"
+     android:gravity="center">
+-    <TextClock android:id="@+id/date_view"
++    <TextView android:id="@+id/date_view"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:textColor="@color/clock_white"
+diff --git a/alps/frameworks/base/packages/Keyguard/src/com/android/keyguard/KeyguardStatusView.java b/alps/frameworks/base/packages/Keyguard/src/com/android/keyguard/KeyguardStatusView.java
+old mode 100644
+new mode 100755
+index 86244b8..d45ff99
+--- a/alps/frameworks/base/packages/Keyguard/src/com/android/keyguard/KeyguardStatusView.java
++++ b/alps/frameworks/base/packages/Keyguard/src/com/android/keyguard/KeyguardStatusView.java
+@@ -41,6 +41,7 @@ import com.android.internal.widget.LockPatternUtils;
+ import com.mediatek.keyguard.Clock.ClockView;
+ 
+ import java.util.Locale;
++import java.util.Calendar;//lilong 20140822 add for Fixed AG/KK-272
+ 
+ public class KeyguardStatusView extends GridLayout {
+     private static final boolean DEBUG = KeyguardConstants.DEBUG;
+@@ -50,7 +51,7 @@ public class KeyguardStatusView extends GridLayout {
+     private final AlarmManager mAlarmManager;
+ 
+     private TextView mAlarmStatusView;
+-    private TextClock mDateView;
++    private TextView mDateView;
+     private TextClock mClockView;
+     private TextView mOwnerInfo;
+ 
+@@ -131,11 +132,11 @@ public class KeyguardStatusView extends GridLayout {
+         }
+ 
+         mAlarmStatusView = (TextView) findViewById(R.id.alarm_status);
+-        mDateView = (TextClock) findViewById(R.id.date_view);
++        mDateView = (TextView) findViewById(R.id.date_view);
+         mOwnerInfo = (TextView) findViewById(R.id.owner_info);
+ 
+         if (bA1Support) {
+-            mDateView.setShowCurrentUserTime(true);
++            //mDateView.setShowCurrentUserTime(true);//hetian remove for date format 20160311
+             mClockView.setShowCurrentUserTime(true);
+         }
+ 
+@@ -165,8 +166,12 @@ public class KeyguardStatusView extends GridLayout {
+     }
+ 
+     public void refreshTime() {
+-        mDateView.setFormat24Hour(Patterns.dateView);
+-        mDateView.setFormat12Hour(Patterns.dateView);
++        //mDateView.setFormat24Hour(Patterns.dateView);
++        //mDateView.setFormat12Hour(Patterns.dateView);
++		java.text.DateFormat shortDateFormat = DateFormat.getDateFormat(getContext());
++        final Calendar now = Calendar.getInstance();
++		final String dateFormat = shortDateFormat.format(now.getTime());
++        mDateView.setText(dateFormat);
+ 
+         if (bA1Support) {
+             mClockView.setFormat12Hour(Patterns.clockView12);
+diff --git a/alps/frameworks/base/packages/SettingsProvider/res/values/defaults.xml b/alps/frameworks/base/packages/SettingsProvider/res/values/defaults.xml
+index ef74f53..93344ac 100755
+--- a/alps/frameworks/base/packages/SettingsProvider/res/values/defaults.xml
++++ b/alps/frameworks/base/packages/SettingsProvider/res/values/defaults.xml
+@@ -213,4 +213,8 @@
+ 
+     <!-- Default for Settings.Secure.NFC_PAYMENT_COMPONENT -->
+     <string name="def_nfc_payment_component"></string>
++    <!--zgq 20150211 add for: VK_Claro_PE's date format-->
++    <string name="def_claro_date_format">MM-dd-yyyy</string>
++    <!-- [shihaijun] setup default time format. -->
++    <string name="def_time_12_24">12</string>
+ </resources>
+diff --git a/alps/frameworks/base/packages/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java b/alps/frameworks/base/packages/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java
+index 8b4fa0c..944a257 100755
+--- a/alps/frameworks/base/packages/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java
++++ b/alps/frameworks/base/packages/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java
+@@ -2388,6 +2388,10 @@ class DatabaseHelper extends SQLiteOpenHelper {
+ 
+             // Set default tty mode
+             loadSetting(stmt, Settings.System.TTY_MODE, 0);
++	    //zgq 20150211 add for: VK_Claro_PE's date format
++            loadStringSetting(stmt,Settings.System.DATE_FORMAT,
++                                        R.string.def_claro_date_format);
++	    loadStringSetting(stmt, Settings.System.TIME_12_24, R.string.def_time_12_24);
+ 
+             loadIntegerSetting(stmt, Settings.System.SCREEN_BRIGHTNESS,
+                     R.integer.def_screen_brightness);
+diff --git a/alps/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/policy/DateView.java b/alps/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/policy/DateView.java
+old mode 100644
+new mode 100755
+index 186005c..8f981e0
+--- a/alps/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/policy/DateView.java
++++ b/alps/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/policy/DateView.java
+@@ -30,13 +30,15 @@ import com.android.systemui.R;
+ import java.text.SimpleDateFormat;
+ import java.util.Date;
+ import java.util.Locale;
++import android.text.format.DateFormat; //lilong 20140822 add for fixed AG/KK-272£¨◊¥Ã¨¿∏»’∆⁄∏Ò Ω”Î…Ë÷√÷–“ª÷¬
+ 
+ public class DateView extends TextView {
+     private static final String TAG = "DateView";
+ 
+     private final Date mCurrentTime = new Date();
+ 
+-    private SimpleDateFormat mDateFormat;
++    //private SimpleDateFormat mDateFormat;
++    private java.text.DateFormat mDateFormat;
+     private String mLastText;
+     private String mDatePattern;
+ 
+@@ -103,7 +105,7 @@ public class DateView extends TextView {
+             final String fmt = DateFormat.getBestDateTimePattern(l, mDatePattern);
+             mDateFormat = new SimpleDateFormat(fmt, l);
+         }
+-
++	 mDateFormat = DateFormat.getDateFormat(mContext);//lilong 20140822 add for fixed AG/KK-272£¨◊¥Ã¨¿∏»’∆⁄∏Ò Ω”Î…Ë÷√÷–“ª÷¬
+         mCurrentTime.setTime(System.currentTimeMillis());
+ 
+         final String text = mDateFormat.format(mCurrentTime);
+diff --git a/alps/frameworks/opt/vcard/java/com/android/vcard/VCardEntryCommitter.java b/alps/frameworks/opt/vcard/java/com/android/vcard/VCardEntryCommitter.java
+old mode 100644
+new mode 100755
+index 966c731..e1fb24c
+--- a/alps/frameworks/opt/vcard/java/com/android/vcard/VCardEntryCommitter.java
++++ b/alps/frameworks/opt/vcard/java/com/android/vcard/VCardEntryCommitter.java
+@@ -75,7 +75,7 @@ public class VCardEntryCommitter implements VCardEntryHandler {
+         final long start = System.currentTimeMillis();
+         mOperationList = vcardEntry.constructInsertOperations(mContentResolver, mOperationList);
+         mCounter++;
+-        if (mOperationList != null && mOperationList.size() >= 400) {
++        if (mOperationList != null && mOperationList.size() >= 200) {
+             mCreatedUris.add(pushIntoContentResolver(mOperationList));
+             mCounter = 0;
+             mOperationList = null;
+diff --git a/alps/packages/apps/Settings/res/values-es-rUS/strings.xml b/alps/packages/apps/Settings/res/values-es-rUS/strings.xml
+old mode 100644
+new mode 100755
+index 8c647c8..7089fce
+--- a/alps/packages/apps/Settings/res/values-es-rUS/strings.xml
++++ b/alps/packages/apps/Settings/res/values-es-rUS/strings.xml
+@@ -2878,4 +2878,6 @@
+     <string name="write_settings_description" msgid="6868293938839954623">"Este permiso admite que una aplicaci√≥n modifique la configuraci√≥n del sistema."</string>
+     <string name="write_settings_on" msgid="8230580416068832239">"S√≠"</string>
+     <string name="write_settings_off" msgid="5156104383386336233">"No"</string>
++    <string name="date_time_date_format" msgid="6951498879879281102">"Elegir el formato de fecha"</string>
++    <string name="normal_date_format" msgid="7636406984925498359">"Regional (<xliff:g id="DATE">%s</xliff:g>)"</string>
+ </resources>
+diff --git a/alps/packages/apps/Settings/res/values-es/strings.xml b/alps/packages/apps/Settings/res/values-es/strings.xml
+index 84bbef2..34e81a5 100755
+--- a/alps/packages/apps/Settings/res/values-es/strings.xml
++++ b/alps/packages/apps/Settings/res/values-es/strings.xml
+@@ -2880,4 +2880,6 @@
+     <string name="write_settings_description" msgid="6868293938839954623">"Cuando se concede este permiso, la aplicaci√≥n puede modificar los ajustes del sistema."</string>
+     <string name="write_settings_on" msgid="8230580416068832239">"S√≠"</string>
+     <string name="write_settings_off" msgid="5156104383386336233">"No"</string>
++    <string name="date_time_date_format" msgid="6951498879879281102">"Formato de fecha"</string>
++    <string name="normal_date_format" msgid="7636406984925498359">"Regional (<xliff:g id="DATE">%s</xliff:g>)"</string>
+ </resources>
+diff --git a/alps/packages/apps/Settings/res/values-pt-rPT/strings.xml b/alps/packages/apps/Settings/res/values-pt-rPT/strings.xml
+index e659876..ed83133 100755
+--- a/alps/packages/apps/Settings/res/values-pt-rPT/strings.xml
++++ b/alps/packages/apps/Settings/res/values-pt-rPT/strings.xml
+@@ -2880,4 +2880,6 @@
+     <string name="write_settings_description" msgid="6868293938839954623">"Esta autoriza√ß√£o permite que uma aplica√ß√£o modifique as defini√ß√µes do sistema."</string>
+     <string name="write_settings_on" msgid="8230580416068832239">"Sim"</string>
+     <string name="write_settings_off" msgid="5156104383386336233">"N√£o"</string>
++    <string name="date_time_date_format" msgid="6951498879879281102">"Selecionar formato de data"</string>
++    <string name="normal_date_format" msgid="7636406984925498359">"Regional (<xliff:g id="DATE">%s</xliff:g>)"</string>
+ </resources>
+diff --git a/alps/packages/apps/Settings/res/values-pt/strings.xml b/alps/packages/apps/Settings/res/values-pt/strings.xml
+index cc4c145..30bee20 100755
+--- a/alps/packages/apps/Settings/res/values-pt/strings.xml
++++ b/alps/packages/apps/Settings/res/values-pt/strings.xml
+@@ -2880,4 +2880,6 @@
+     <string name="write_settings_description" msgid="6868293938839954623">"Esta permiss√£o permite que um app modifique configura√ß√µes do sistema."</string>
+     <string name="write_settings_on" msgid="8230580416068832239">"Sim"</string>
+     <string name="write_settings_off" msgid="5156104383386336233">"N√£o"</string>
++    <string name="date_time_date_format" msgid="6951498879879281102">"Escolher formato de data"</string>
++    <string name="normal_date_format" msgid="7636406984925498359">"Regional (<xliff:g id="DATE">%s</xliff:g>)"</string>
+ </resources>
+diff --git a/alps/packages/apps/Settings/res/values-zh-rCN/strings.xml b/alps/packages/apps/Settings/res/values-zh-rCN/strings.xml
+old mode 100644
+new mode 100755
+index 94e27ea..df0b7dc
+--- a/alps/packages/apps/Settings/res/values-zh-rCN/strings.xml
++++ b/alps/packages/apps/Settings/res/values-zh-rCN/strings.xml
+@@ -2880,4 +2880,6 @@
+     <string name="write_settings_description" msgid="6868293938839954623">"Ê≠§ÊùÉÈôêÂÖÅËÆ∏Â∫îÁî®‰øÆÊîπÁ≥ªÁªüËÆæÁΩÆ„ÄÇ"</string>
+     <string name="write_settings_on" msgid="8230580416068832239">"ÂÖÅËÆ∏"</string>
+     <string name="write_settings_off" msgid="5156104383386336233">"‰∏çÂÖÅËÆ∏"</string>
++    <string name="date_time_date_format" msgid="6951498879879281102">"ÈÄâÊã©Êó•ÊúüÊ†ºÂºè"</string>
++    <string name="normal_date_format" msgid="7636406984925498359">"ÊâÄÂú®Âå∫Âüü (<xliff:g id="DATE">%s</xliff:g>)"</string>
+ </resources>
+diff --git a/alps/packages/apps/Settings/res/values/arrays.xml b/alps/packages/apps/Settings/res/values/arrays.xml
+old mode 100644
+new mode 100755
+index 40a26f9..82efd6c
+--- a/alps/packages/apps/Settings/res/values/arrays.xml
++++ b/alps/packages/apps/Settings/res/values/arrays.xml
+@@ -38,6 +38,18 @@
+     <!-- The next level of the time zoner picker should show time zones from ALL regions. -->
+         <item>All</item>
+     </string-array>
++    
++    <!--hetian add for date format 20160311-->
++    <string-array name="date_format_values" translatable="false">
++        <!-- The blank item means to use whatever the locale calls for. -->
++        <item></item>
++        <item>MM-dd-yyyy</item>
++        <item>dd-MM-yyyy</item>
++        <item>yyyy-MM-dd</item>
++        <item>EE-MMM-d-yyyy</item>
++        <item>EE-d-MMM-yyyy</item>
++        <item>yyyy-MMM-d-EE</item>
++    </string-array>
+ 
+     <!-- Display settings.  The delay in inactivity before the screen is turned off. These are shown in a list dialog. -->
+     <string-array name="screen_timeout_entries">
+diff --git a/alps/packages/apps/Settings/res/values/strings.xml b/alps/packages/apps/Settings/res/values/strings.xml
+index 24246ff..f579e32 100755
+--- a/alps/packages/apps/Settings/res/values/strings.xml
++++ b/alps/packages/apps/Settings/res/values/strings.xml
+@@ -6998,4 +6998,7 @@
+     <string name="write_settings_on">Yes</string>
+     <!-- Summary of app not allowed to write system settings [CHAR LIMIT=45] -->
+     <string name="write_settings_off">No</string>
++    <string name="date_time_date_format">Choose date format</string>
++    <string name="normal_date_format">Regional (<xliff:g id="date" example="12-31-2009">%s</xliff:g>)</string>
++    <string name="default_date_format"><xliff:g id="default_date_format">dd/MM/yyyy</xliff:g></string>
+ </resources>
+diff --git a/alps/packages/apps/Settings/res/xml/date_time_prefs.xml b/alps/packages/apps/Settings/res/xml/date_time_prefs.xml
+old mode 100644
+new mode 100755
+index 39d8743..e091c43
+--- a/alps/packages/apps/Settings/res/xml/date_time_prefs.xml
++++ b/alps/packages/apps/Settings/res/xml/date_time_prefs.xml
+@@ -52,5 +52,8 @@
+     <SwitchPreference android:key="24 hour"
+         android:title="@string/date_time_24hour"
+         />
+-
++    <ListPreference
++        android:key="date_format"
++        android:title="@string/date_time_date_format"
++        android:summary="mm/dd/yyyy"/>
+ </PreferenceScreen>
+diff --git a/alps/packages/apps/Settings/src/com/android/settings/DateTimeSettings.java b/alps/packages/apps/Settings/src/com/android/settings/DateTimeSettings.java
+old mode 100644
+new mode 100755
+index 0215dfb..17455bd
+--- a/alps/packages/apps/Settings/src/com/android/settings/DateTimeSettings.java
++++ b/alps/packages/apps/Settings/src/com/android/settings/DateTimeSettings.java
+@@ -63,7 +63,7 @@ public class DateTimeSettings extends SettingsPreferenceFragment
+     // The date value is dummy (independent of actual date).
+     private Calendar mDummyDate;
+ 
+-    // /M: modify as MTK add GPS time Sync feature
++    private static final String KEY_DATE_FORMAT = "date_format";
+     private static final String KEY_AUTO_TIME = "auto_time_list";
+     private static final String KEY_AUTO_TIME_ZONE = "auto_zone";
+ 
+@@ -81,6 +81,7 @@ public class DateTimeSettings extends SettingsPreferenceFragment
+     private SwitchPreference mAutoTimeZonePref;
+     private Preference mTimeZone;
+     private Preference mDatePref;
++	private ListPreference mDateFormat;
+ 
+     // /M: add for GPS time sync feature @{
+     private static final int DIALOG_GPS_CONFIRM = 2;
+@@ -151,11 +152,41 @@ public class DateTimeSettings extends SettingsPreferenceFragment
+         mTime24Pref = findPreference("24 hour");
+         mTimeZone = findPreference("timezone");
+         mDatePref = findPreference("date");
++        mDateFormat = (ListPreference) findPreference(KEY_DATE_FORMAT);
+         if (isFirstRun) {
+             getPreferenceScreen().removePreference(mTime24Pref);
++            getPreferenceScreen().removePreference(mDateFormat);
++        }
++
++        String [] dateFormats = getResources().getStringArray(R.array.date_format_values);
++        String [] formattedDates = new String[dateFormats.length];
++        String currentFormat = getDateFormat();
++        // Initialize if DATE_FORMAT is not set in the system settings
++        // This can happen after a factory reset (or data wipe)
++        if (currentFormat == null) {
++            currentFormat = "";
++        }
++
++        // Prevents duplicated values on date format selector.
++        mDummyDate.set(mDummyDate.get(Calendar.YEAR), mDummyDate.DECEMBER, 31, 13, 0, 0);
++
++        for (int i = 0; i < formattedDates.length; i++) {
++            String formatted =
++                    DateFormat.getDateFormatForSetting(getActivity(), dateFormats[i])
++                    .format(mDummyDate.getTime());
++
++            if (dateFormats[i].length() == 0) {
++                formattedDates[i] = getResources().
++                    getString(R.string.normal_date_format, formatted);
++            } else {
++                formattedDates[i] = formatted;
++            }
+         }
+ 
+-        // /M: modify as MTK add GPS time Sync feature
++        mDateFormat.setEntries(formattedDates);
++        mDateFormat.setEntryValues(R.array.date_format_values);
++        mDateFormat.setValue(currentFormat);
++
+         boolean autoEnabled = autoTimeEnabled || autoTimeGpsEnabled;
+         mTimePref.setEnabled(!autoEnabled);
+         mDatePref.setEnabled(!autoEnabled);
+@@ -179,6 +210,7 @@ public class DateTimeSettings extends SettingsPreferenceFragment
+         getActivity().registerReceiver(mIntentReceiver, filter, null, null);
+ 
+         updateTimeAndDateDisplay(getActivity());
++        updateDateFormatEntries();
+     }
+ 
+     @Override
+@@ -190,24 +222,43 @@ public class DateTimeSettings extends SettingsPreferenceFragment
+     }
+ 
+     public void updateTimeAndDateDisplay(Context context) {
++        java.text.DateFormat shortDateFormat = DateFormat.getDateFormat(context);
+         final Calendar now = Calendar.getInstance();
+         mDummyDate.setTimeZone(now.getTimeZone());
+         // We use December 31st because it's unambiguous when demonstrating the date format.
+         // We use 13:00 so we can demonstrate the 12/24 hour options.
+         mDummyDate.set(now.get(Calendar.YEAR), 11, 31, 13, 0, 0);
+         Date dummyDate = mDummyDate.getTime();
+-        mDatePref.setSummary(DateFormat.getLongDateFormat(context).format(now.getTime()));
++        mDatePref.setSummary(shortDateFormat.format(now.getTime()));
+         mTimePref.setSummary(DateFormat.getTimeFormat(getActivity()).format(now.getTime()));
+         mTimeZone.setSummary(ZoneGetter.getTimeZoneOffsetAndName(now.getTimeZone(), now.getTime()));
++		mDateFormat.setSummary(shortDateFormat.format(dummyDate));
+         mTime24Pref.setSummary(DateFormat.getTimeFormat(getActivity()).format(dummyDate));
+     }
+ 
++    private void updateDateFormatEntries() {
++        String [] dateFormats = getResources().getStringArray(R.array.date_format_values);
++        String [] formattedDates = new String[dateFormats.length];
++        for (int i = 0; i < formattedDates.length; i++) {
++            String formatted =
++                    DateFormat.getDateFormatForSetting(getActivity(), dateFormats[i])
++                    .format(mDummyDate.getTime());
++            if (dateFormats[i].length() == 0) {
++                formattedDates[i] = getResources().
++                    getString(R.string.normal_date_format, formatted);
++            } else {
++                formattedDates[i] = formatted;
++            }
++        }
++        mDateFormat.setEntries(formattedDates);
++    }
+     @Override
+     public void onDateSet(DatePicker view, int year, int month, int day) {
+         final Activity activity = getActivity();
+         if (activity != null) {
+             setDate(activity, year, month, day);
+             updateTimeAndDateDisplay(activity);
++            updateDateFormatEntries();
+         }
+     }
+ 
+@@ -226,8 +277,13 @@ public class DateTimeSettings extends SettingsPreferenceFragment
+ 
+     @Override
+     public void onSharedPreferenceChanged(SharedPreferences preferences, String key) {
+-        if (key.equals(KEY_AUTO_TIME)) {
+-            // /M: modify as MTK add GPS time Sync feature @{
++        if (key.equals(KEY_DATE_FORMAT)) {
++            String format = preferences.getString(key,
++                    getResources().getString(R.string.default_date_format));
++            Settings.System.putString(getContentResolver(),
++                    Settings.System.DATE_FORMAT, format);
++            updateTimeAndDateDisplay(getActivity());
++        } else if (key.equals(KEY_AUTO_TIME)) {
+             String value = mAutoTimePref.getValue();
+             int index = mAutoTimePref.findIndexOfValue(value);
+             mAutoTimePref.setSummary(value);
+@@ -375,6 +431,11 @@ public class DateTimeSettings extends SettingsPreferenceFragment
+                 is24Hour? HOURS_24 : HOURS_12);
+     }
+ 
++    private String getDateFormat() {
++        return Settings.System.getString(getContentResolver(),
++                Settings.System.DATE_FORMAT);
++    }
++
+     private boolean getAutoState(String name) {
+         try {
+             return Settings.Global.getInt(getContentResolver(), name) > 0;
+@@ -416,6 +477,7 @@ public class DateTimeSettings extends SettingsPreferenceFragment
+             final Activity activity = getActivity();
+             if (activity != null) {
+                 updateTimeAndDateDisplay(activity);
++                updateDateFormatEntries();
+             }
+         }
+     };
+-- 
+2.3.7
+

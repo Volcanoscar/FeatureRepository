@@ -1,0 +1,275 @@
+From 71173348fe4fd404c6b630fcbb79e36e8d8b664f Mon Sep 17 00:00:00 2001
+From: moduanke <moduanke@hkzechin.com>
+Date: Thu, 26 May 2016 16:35:52 +0800
+Subject: [PATCH] =?UTF-8?q?[Bmobile][Mms]=E9=A2=84=E7=BD=AE=E5=B0=8F?=
+ =?UTF-8?q?=E5=8C=BA=E5=B9=BF=E6=92=AD=E9=A2=91=E9=81=9350,=20919,=20921,?=
+ =?UTF-8?q?=204370?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../android/providers/telephony/CbProvider.java    |   2 +
+ .../packages/apps/Mms/AndroidManifest.xml          |   2 +
+ .../com/mediatek/cb/cbmsg/CBMessageReceiver.java   |   7 +-
+ .../cb/cbmsg/CBMessageReceiverService.java         | 168 ++++++++++++++++++++-
+ 4 files changed, 177 insertions(+), 2 deletions(-)
+
+diff --git a/alps/packages/providers/TelephonyProvider/src/com/android/providers/telephony/CbProvider.java b/alps/packages/providers/TelephonyProvider/src/com/android/providers/telephony/CbProvider.java
+index 3d7ac48..c32acf5 100755
+--- a/alps/packages/providers/TelephonyProvider/src/com/android/providers/telephony/CbProvider.java
++++ b/alps/packages/providers/TelephonyProvider/src/com/android/providers/telephony/CbProvider.java
+@@ -134,8 +134,10 @@ public class CbProvider extends ContentProvider {
+             // break;
+         case URL_CHANNEL:
+             qb.setTables(CbDatabaseHelper.CHANNEL_TABLE);
++            if (selection == null || !selection.contains("sub_id")) {
+             qb.appendWhere("(sub_id = " + SmsProvider.getSubIdFromUri(url)
+                     + ")");
++            }
+             break;
+         case URL_CONVERSATION:
+             // qb.setTables(CbDatabaseHelper.CONVERSATION_TABLE);
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/AndroidManifest.xml b/alps/vendor/mediatek/proprietary/packages/apps/Mms/AndroidManifest.xml
+index 29495c1..d0d0ec9 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/AndroidManifest.xml
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/AndroidManifest.xml
+@@ -523,6 +523,8 @@
+             android:permission="android.permission.BROADCAST_SMS">
+             <intent-filter>
+                 <action android:name="android.provider.Telephony.SMS_CB_RECEIVED" />
++                <!-- for add default cb channel -->
++		  <action android:name="android.intent.action.SIM_STATE_CHANGED" />
+             </intent-filter>
+         </receiver>
+ 
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/cb/cbmsg/CBMessageReceiver.java b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/cb/cbmsg/CBMessageReceiver.java
+index 7415026..f9ee4f0 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/cb/cbmsg/CBMessageReceiver.java
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/cb/cbmsg/CBMessageReceiver.java
+@@ -64,6 +64,7 @@ import com.android.mms.MmsApp;
+ import com.android.mms.util.MmsLog;
+ import com.mediatek.mms.util.PermissionCheckUtil;
+ 
++import com.android.internal.telephony.TelephonyIntents;
+ /**
+  * M:
+  * Handle incoming SMSes.  Just dispatches the work off to a Service.
+@@ -98,7 +99,11 @@ public class CBMessageReceiver extends BroadcastReceiver {
+                         + intent.getAction() + ", result = " + getResultCode());
+ 
+         intent.setClass(context, CBMessageReceiverService.class);
+-        intent.putExtra("result", getResultCode());
++        //intent.putExtra("result", getResultCode());
++	MmsLog.d(" CBMessageReceiver ", " CBMessageReceiver.onReceiveWithPrivilege 97 "); // modify by mtk_debug 2015-3-05;
++	if(!TelephonyIntents.ACTION_SIM_STATE_CHANGED.equals(intent.getAction())){
++	intent.putExtra("result", getResultCode());
++	}
+         beginStartingService(context, intent);
+     }
+ 
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/cb/cbmsg/CBMessageReceiverService.java b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/cb/cbmsg/CBMessageReceiverService.java
+index d3251c7..2c92ea3 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/cb/cbmsg/CBMessageReceiverService.java
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/cb/cbmsg/CBMessageReceiverService.java
+@@ -81,7 +81,19 @@ import com.mediatek.mms.ext.IOpCBMessageReceiverServiceExt;
+ import com.mediatek.opmsg.util.OpMessageUtils;
+ 
+ import android.telephony.SubscriptionManager;
+-
++//add for cbc channel
++import android.content.ComponentName;
++import com.android.mms.ui.ClassZeroActivity;
++import android.provider.Telephony;
++import com.android.internal.telephony.gsm.SmsBroadcastConfigInfo;
++import android.content.ContentValues;
++import android.database.Cursor;
++import android.util.Log;
++import com.android.internal.telephony.IccCardConstants;
++import com.android.internal.telephony.TelephonyIntents;
++import android.telephony.SmsManager;
++import android.provider.Telephony.Sms.Intents;
++import com.android.internal.telephony.PhoneConstants;
+ /**
+  * M:
+  * This service essentially plays the role of a "worker thread", allowing us to store
+@@ -97,6 +109,17 @@ public class CBMessageReceiverService extends Service {
+ 
+     private static final Uri MESSAGE_URI = Telephony.SmsCb.CONTENT_URI;
+     private static final int DEFAULT_SUB_ID = 1;
++    //add for cbc channel
++    private static final int MESSAGE_SET_STATE = 33;
++    private static final int MESSAGE_SET_CONFIG = 32;
++    private static final String KEYID = "_id";
++    private static final String NAME = "name";
++    private static final String NUMBER = "number";
++    private static final String ENABLE = "enable";
++    private static final String SUBID = "sub_id";
++    private static final Uri CHANNEL_URI = Uri.parse("content://cb/channel");
++    private static final int EVENT_RETRY_ADD_CHANNEL_TIME_OUT = 101;
++    private static boolean isAddingDefaultChannel = false;
+ 
+     public Handler mToastHandler = new Handler() {
+         @Override
+@@ -165,10 +188,20 @@ public class CBMessageReceiverService extends Service {
+                 if (Telephony.Sms.Intents.SMS_CB_RECEIVED_ACTION.equals(action)) {
+                     handleCBMessageReceived(intent);
+                 }
++          //ADD for CBC CHANNEL
++		  if(TelephonyIntents.ACTION_SIM_STATE_CHANGED.equals(intent.getAction())){
++
++			synchronized(this){
++				handleSIMStateChangedReceived(intent);
++			}
++		  }
++          //ADD for CBC CHANNEL
+             }
+             // NOTE: We MUST not call stopSelf() directly, since we need to
+             // make sure the wake lock acquired by AlertReceiver is released.
++             if(!isAddingDefaultChannel){
+             CBMessageReceiver.finishStartingService(CBMessageReceiverService.this, serviceId);
++             	}
+         }
+     }
+ 
+@@ -242,4 +275,137 @@ public class CBMessageReceiverService extends Service {
+         values.put(Telephony.SmsCb.BODY, body);
+         return values;
+     }
++	//add for cbc channel
++ 	private void handleSIMStateChangedReceived(Intent intent) {
++			int  subId = intent.getIntExtra(PhoneConstants.SUBSCRIPTION_KEY, SubscriptionManager.INVALID_SUBSCRIPTION_ID);
++			String stateExtra = intent.getStringExtra(IccCardConstants.INTENT_KEY_ICC_STATE);
++			Log.d(" CBMessageReceiverService ", " CBMessageReceiverService.handleSIMStateChangedReceived 214 stateExtra="+stateExtra); 
++			if(IccCardConstants.INTENT_VALUE_ICC_READY.equals(stateExtra)){
++					if(queryIfChannelInDatabase(subId,"Canal1",50)||queryIfChannelInDatabase(subId,"Canal2",919)
++						||queryIfChannelInDatabase(subId,"Canal3",921)||queryIfChannelInDatabase(subId,"Canal4",4370))
++					{
++					isAddingDefaultChannel=false;
++					}else{
++					if(SmsManager.getSmsManagerForSubscriptionId(subId).activateCellBroadcastSms(true))
++					{                     
++					addCustomChanneltoList(subId,"Canal1",50);
++					addCustomChanneltoList(subId,"Canal2",919);
++					addCustomChanneltoList(subId,"Canal3",921);
++					addCustomChanneltoList(subId,"Canal4",4370);
++					isAddingDefaultChannel=false;
++					 
++					}else{
++
++					//add retry
++					if (!mServiceHandler.hasMessages(EVENT_RETRY_ADD_CHANNEL_TIME_OUT)) {
++					Message msg = mServiceHandler.obtainMessage(EVENT_RETRY_ADD_CHANNEL_TIME_OUT,intent);
++					Log.d(" CBMessageReceiverService ", " CBMessageReceiverService.handleSIMStateChangedReceived send retry message 235 "); // modify by mtk_debug 2015-3-19;
++					mServiceHandler.sendMessageDelayed(msg, 2000);
++					isAddingDefaultChannel=true;
++			}
++			}
++			}
++	}
++}
++		private void addCustomChanneltoList(int  mSubId,String channelName,int channelNum){
++			Log.d(TAG, "addCustomChanneltoList: mSubId=" + mSubId
++			+ ", channelName= " + channelName + ", channelNum= " + channelNum);
++
++			SmsBroadcastConfigInfo[] objectList = new SmsBroadcastConfigInfo[1];
++			objectList[0] = new SmsBroadcastConfigInfo(channelNum,channelNum, -1, -1, true);
++
++			Log.d(TAG, "addCustomChanneltoList: setCellBroadcastSmsConfig");
++
++			boolean isSetConfigSuccess = SmsManager.getSmsManagerForSubscriptionId(mSubId).setCellBroadcastSmsConfig(objectList, objectList);
++
++			if(isSetConfigSuccess){
++				Log.d(" CBMessageReceiverService ", " CBMessageReceiverService.addCustomChanneltoList set channel " +channelNum +" success 784 "); // modify by mtk_debug 2015-3-05;
++				addChannelToDatabase(mSubId,channelName,channelNum);
++			}else{
++				Log.d(" CBMessageReceiverService ", " CBMessageReceiverService.addCustomChanneltoList set channel "+ channelNum +" failed 786 "); // modify by mtk_debug 2015-3-05;
++			}
++			Log.d(TAG, " CBMessageReceiverService addCustomChanneltoList: function end");
++		}
++		private boolean addChannelToDatabase(int  mSubId,String channelName,int channelNum){
++			// ClearChannel();
++			Log.d(TAG, "addChannelToDatabase: mSubId=" + mSubId
++			+ ", channelName= " + channelName + ", channelNum= " + channelNum);
++			String[] projection = new String[] { NUMBER, SUBID};
++			String SELECTIONNum = "(" + NUMBER + " = " + channelNum + ")"; 
++			String SELECTIONid = "(" + SUBID + " = " + mSubId + ")";
++			Cursor cursornum = null;
++			Cursor cursorid = null;
++
++			Cursor cursorzz = this.getContentResolver().query(CHANNEL_URI,
++			projection,
++			NUMBER + " = ? AND " +
++			SUBID + " = ?",
++			new String[] {String.valueOf(channelNum), String.valueOf(mSubId)},
++			null);
++			Log.d(TAG, "addChannelToDatabase: cursor.getCount"+cursorzz.getCount());
++			if(cursorzz.getCount() == 0){//if ((cursornum.getCount() == 0)&&(cursorid.getCount() == 0)){ 
++			Log.d(" CBMessageReceiverService ", " SmsReceiverService.addChannelToDatabase add mSubId=" + mSubId
++			+ ", channelName= " + channelName + ", channelNum= " + channelNum +"to database"); // modify by mtk_debug 2015-3-05;
++			ContentValues values = new ContentValues();
++			values.put(NAME,channelName);
++			values.put(NUMBER, channelNum);
++			values.put(ENABLE, true); 
++			values.put(SUBID, mSubId);
++			try {
++				//if(mSimId==PhoneConstants.SUB1){
++				this.getContentResolver().insert(CHANNEL_URI, values);
++				//}else if(mSimId==PhoneConstants.SUB2){
++				// this.getContentResolver().insert(CHANNEL_URI1, values);
++				//}
++			} catch (Exception e){
++				Log.d(" CBMessageReceiverService ", " SmsReceiverService.addChannelToDatabase exception 828 "); // modify by mtk_debug 2015-3-05;
++				//cursornum.close();
++				//cursorid.close();
++				cursorzz.close();
++				return false;
++			}
++				//cursornum.close();
++				// cursorid.close();
++				cursorzz.close();
++				return true;
++			}
++			else{
++				//cursornum.close();
++				//cursorid.close();
++				cursorzz.close();
++				return false;
++			}
++
++		} 
++		private boolean queryIfChannelInDatabase(int  mSubId,String channelName,int channelNum){
++
++			Log.d(TAG, "queryIfChannelInDatabase: mSubId=" + mSubId
++			+ ", channelName= " + channelName + ", channelNum= " + channelNum);
++			String[] projection = new String[] { NUMBER, SUBID};
++			String SELECTIONNum = "(" + NUMBER + " = " + channelNum + ")"; 
++			String SELECTIONid = "(" + SUBID + " = " + mSubId + ")";
++			Cursor cursornum = null;
++			Cursor cursorid = null;
++
++			Cursor cursorzz = this.getContentResolver().query(CHANNEL_URI,
++			projection,
++			NUMBER + " = ? AND " +
++			SUBID + " = ?",
++			new String[] {String.valueOf(channelNum),String.valueOf(mSubId)},
++			null);
++
++			if(cursorzz != null&&cursorzz.getCount() > 0){
++				//if ((cursornum.getCount() != 0)&&(cursorid.getCount() != 0)){
++				Log.d(TAG, "queryIfChannelInDatabase: cursor.getCount"+cursorzz.getCount());
++				cursorzz.close();
++				return true;
++
++
++			}else{
++				cursorzz.close();
++				Log.d(TAG, "queryIfChannelInDatabase: return false");
++				return false;
++			}
++
++		}
+ }
+-- 
+2.3.7
+

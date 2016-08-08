@@ -1,0 +1,214 @@
+From 41f7977515c1dfe39d0992c54de73e860a344a6e Mon Sep 17 00:00:00 2001
+From: tianyunfei <tianyunfei@hkzechin.com>
+Date: Wed, 9 Mar 2016 16:37:47 +0800
+Subject: [PATCH] =?UTF-8?q?[BLU][SystemUI]=E6=9C=80=E8=BF=91=E4=BB=BB?=
+ =?UTF-8?q?=E5=8A=A1=E7=95=8C=E9=9D=A2=E6=B7=BB=E5=8A=A0clear=20all?=
+ =?UTF-8?q?=E6=8C=89=E9=94=AE?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../base/packages/SystemUI/res/layout/recents.xml  | 22 ++++++--
+ .../android/systemui/recents/RecentsActivity.java  | 60 ++++++++++++++++++++++
+ .../systemui/recents/views/RecentsView.java        | 23 +++++++++
+ 3 files changed, 102 insertions(+), 3 deletions(-)
+ mode change 100644 => 100755 alps/frameworks/base/packages/SystemUI/res/layout/recents.xml
+ mode change 100644 => 100755 alps/frameworks/base/packages/SystemUI/src/com/android/systemui/recents/RecentsActivity.java
+ mode change 100644 => 100755 alps/frameworks/base/packages/SystemUI/src/com/android/systemui/recents/views/RecentsView.java
+
+diff --git a/alps/frameworks/base/packages/SystemUI/res/layout/recents.xml b/alps/frameworks/base/packages/SystemUI/res/layout/recents.xml
+old mode 100644
+new mode 100755
+index bdda527..f6e4b13
+--- a/alps/frameworks/base/packages/SystemUI/res/layout/recents.xml
++++ b/alps/frameworks/base/packages/SystemUI/res/layout/recents.xml
+@@ -13,8 +13,13 @@
+      See the License for the specific language governing permissions and
+      limitations under the License.
+ -->
+-<FrameLayout
+-    xmlns:android="http://schemas.android.com/apk/res/android"
++<!--tianyunfei 20160304 add clear all button start-->
++<RelativeLayout
++   xmlns:android="http://schemas.android.com/apk/res/android"
++   android:layout_width="match_parent"
++   android:layout_height="match_parent" >
++<!--tianyunfei 20160304 add clear all button end-->
++ <FrameLayout
+     android:layout_width="match_parent"
+     android:layout_height="match_parent">
+     <!-- Status Bar Scrim View -->
+@@ -54,4 +59,15 @@
+         android:layout_gravity="center_horizontal|bottom"
+         android:scaleType="fitXY"
+         android:src="@drawable/recents_lower_gradient" />
+-</FrameLayout>
+\ No newline at end of file
++ </FrameLayout>
++  <!--tianyunfei 20160304 add clear all button start-->
++    <Button
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:layout_centerHorizontal="true"
++            android:text="@string/clear_all_notifications_text"
++            android:id="@+id/recent_clearall"
++            android:layout_alignParentBottom="true"
++            android:layout_marginBottom="50dip" />
++</RelativeLayout>
++  <!--tianyunfei 20160304 add clear all button end-->
+\ No newline at end of file
+diff --git a/alps/frameworks/base/packages/SystemUI/src/com/android/systemui/recents/RecentsActivity.java b/alps/frameworks/base/packages/SystemUI/src/com/android/systemui/recents/RecentsActivity.java
+old mode 100644
+new mode 100755
+index dfb9e1c..aa7f934
+--- a/alps/frameworks/base/packages/SystemUI/src/com/android/systemui/recents/RecentsActivity.java
++++ b/alps/frameworks/base/packages/SystemUI/src/com/android/systemui/recents/RecentsActivity.java
+@@ -56,6 +56,12 @@ import java.util.ArrayList;
+ import com.mediatek.multiwindow.MultiWindowProxy;
+ ///@}
+ 
++/*tianyunfei 20160304 add clear all button start*/
++import android.widget.Button;
++import android.view.View.OnClickListener;
++/*tianyunfei 20160304 add clear all button end*/
++
++
+ /**
+  * The main Recents activity that is started from AlternateRecentsComponent.
+  */
+@@ -65,6 +71,10 @@ public class RecentsActivity extends Activity implements RecentsView.RecentsView
+ 
+     RecentsConfiguration mConfig;
+     long mLastTabKeyEventTime;
++    /*tianyunfei 20160304 add clear all button start*/
++    static final String TAG = "recents.RecentsActivity";
++    static final boolean DEBUG = true;
++    /*tianyunfei 20160304 add clear all button end*/
+ 
+     // Top level views
+     RecentsView mRecentsView;
+@@ -73,6 +83,11 @@ public class RecentsActivity extends Activity implements RecentsView.RecentsView
+     ViewStub mDebugOverlayStub;
+     View mEmptyView;
+     DebugOverlayView mDebugOverlay;
++    
++     /*tianyunfei 20160304 add clear all button start*/
++    Button mClearAll;
++       boolean mClearVisible;
++       /*tianyunfei 20160304 add clear all button end*/
+ 
+     // Resize task debug
+     RecentsResizeTaskDialog mResizeTaskDebugDialog;
+@@ -224,6 +239,7 @@ public class RecentsActivity extends Activity implements RecentsView.RecentsView
+         if (!mConfig.launchedWithNoRecentTasks) {
+             mRecentsView.setTaskStacks(stacks);
+         }
++        mClearVisible = !mConfig.launchedWithNoRecentTasks;//tianyunfei 20160304 add clear all button
+ 
+         // Create the home intent runnable
+         Intent homeIntent = new Intent(Intent.ACTION_MAIN, null);
+@@ -273,6 +289,7 @@ public class RecentsActivity extends Activity implements RecentsView.RecentsView
+                 refreshSearchWidgetView();
+             }
+         }
++        setClearAllButtonVisiable();//tianyunfei 20160304 add clear all button
+ 
+         // Animate the SystemUI scrims into view
+         mScrimViews.prepareEnterRecentsAnimation();
+@@ -299,6 +316,30 @@ public class RecentsActivity extends Activity implements RecentsView.RecentsView
+         }
+         MetricsLogger.histogram(this, "overview_task_count", taskCount);
+     }
++    
++     /*tianyunfei 20160304 add clear all button start*/
++    void setClearAllButtonVisiable(){
++         if (DEBUG) {
++                Log.d(TAG, "updateRecentsTasks:mConfig.mClearVisible= " + mClearVisible);
++                  }
++         if (mClearVisible) {
++                       if(mClearAll != null){
++                          mClearAll.setVisibility(View.VISIBLE);
++                                if (DEBUG) {
++                                    Log.d(TAG, "mClearAll: visible");
++                                }
++                       }
++                    }else{
++                     if(mClearAll != null){
++                                mClearAll.setVisibility(View.GONE);
++                                if (DEBUG) {
++                       Log.d(TAG, "mClearAll: gone");
++               }
++                     }
++                  }
++       }
++        /*tianyunfei 20160304 add clear all button end*/
++
+ 
+     /** Dismisses recents if we are already visible and the intent is to toggle the recents view */
+     boolean dismissRecentsToFocusedTaskOrHome(boolean checkFilteredStackState) {
+@@ -385,6 +426,25 @@ public class RecentsActivity extends Activity implements RecentsView.RecentsView
+         filter.addAction(Intent.ACTION_SCREEN_OFF);
+         filter.addAction(SearchManager.INTENT_GLOBAL_SEARCH_ACTIVITY_CHANGED);
+         registerReceiver(mSystemBroadcastReceiver, filter);
++        
++        /*tianyunfei 20160304 add clear all button start*/
++        mClearAll=(Button)findViewById(R.id.recent_clearall);
++	    	if(mClearAll != null){
++			        mClearAll.setOnClickListener(new OnClickListener() {
++              @Override
++              public void onClick(View v) {
++                   if(mRecentsView!=null){
++				   	          mRecentsView.clearAllTask();
++					            // Remove all the views
++				   	          //mRecentsView.removeAllTaskStacks();
++                      //mRecentsView.onAllTaskViewsDismissed();
++				              dismissRecentsToHome(true);
++                      //RecentsActivity.this.finish();
++                   }
++              }
++              });
++	    	}
++	    	/*tianyunfei 20160304 add clear all button end*/
+     }
+ 
+     /** Inflates the debug overlay if debug mode is enabled. */
+diff --git a/alps/frameworks/base/packages/SystemUI/src/com/android/systemui/recents/views/RecentsView.java b/alps/frameworks/base/packages/SystemUI/src/com/android/systemui/recents/views/RecentsView.java
+old mode 100644
+new mode 100755
+index 947c19c..10aa3a7
+--- a/alps/frameworks/base/packages/SystemUI/src/com/android/systemui/recents/views/RecentsView.java
++++ b/alps/frameworks/base/packages/SystemUI/src/com/android/systemui/recents/views/RecentsView.java
+@@ -182,6 +182,29 @@ public class RecentsView extends FrameLayout implements TaskStackView.TaskStackV
+         }
+         return returnTask;
+     }
++    
++    /*tianyunfei 20160304 add clear all button start*/
++    public void clearAllTask() {
++                   // Get the first stack view
++               int childCount = getChildCount();                
++                   for (int i = 0; i < childCount; i++) {
++                       View child = getChildAt(i);
++                             if (child != mSearchBar) {
++                                 TaskStackView stackView = (TaskStackView) child;
++                                 TaskStack stack = stackView.mStack;
++                                 ArrayList<Task> tasks = stack.getTasks();
++                           // Find the launch task in the stack
++                                 if (!tasks.isEmpty()) {
++                                            int taskCount = tasks.size();
++                                            for (int j = 0; j < taskCount; j++) {
++                                                       Task task = tasks.get(j);
++                                                       onTaskViewDismissed(task);
++                                            }
++                                 }
++                             }
++                   }
++       }
++       /*tianyunfei 20160304 add clear all button end*/
+ 
+     /** Launches the focused task from the first stack if possible */
+     public boolean launchFocusedTask() {
+-- 
+2.3.7
+

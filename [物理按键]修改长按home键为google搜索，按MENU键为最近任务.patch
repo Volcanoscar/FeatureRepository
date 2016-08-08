@@ -1,0 +1,116 @@
+From df06d0a719fc9e0e7493d3ce57f890f872022f29 Mon Sep 17 00:00:00 2001
+From: wujiao <wujiao@hkzechin.com>
+Date: Sun, 13 Mar 2016 18:41:28 +0800
+Subject: [PATCH] =?UTF-8?q?[=E5=B9=B3=E5=8F=B0][=E7=89=A9=E7=90=86?=
+ =?UTF-8?q?=E6=8C=89=E9=94=AE=E5=AE=9A=E5=88=B6][AM-23]=E4=BF=AE=E6=94=B9?=
+ =?UTF-8?q?=E9=95=BF=E6=8C=89home=E9=94=AE=E4=B8=BAgoogle=E6=90=9C?=
+ =?UTF-8?q?=E7=B4=A2=EF=BC=8C=E6=8C=89MENU=E9=94=AE=E4=B8=BA=E6=9C=80?=
+ =?UTF-8?q?=E8=BF=91=E4=BB=BB=E5=8A=A1?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../base/core/java/android/app/SearchManager.java  |  7 +++++
+ .../frameworks/base/core/res/res/values/config.xml |  2 +-
+ .../android/server/policy/PhoneWindowManager.java  | 33 ++++++++++++++++++++--
+ 3 files changed, 39 insertions(+), 3 deletions(-)
+ mode change 100644 => 100755 alps/frameworks/base/core/java/android/app/SearchManager.java
+
+diff --git a/alps/frameworks/base/core/java/android/app/SearchManager.java b/alps/frameworks/base/core/java/android/app/SearchManager.java
+old mode 100644
+new mode 100755
+index 9e32164..7d4eae8
+--- a/alps/frameworks/base/core/java/android/app/SearchManager.java
++++ b/alps/frameworks/base/core/java/android/app/SearchManager.java
+@@ -949,6 +949,13 @@ public class SearchManager
+     public Intent getAssistIntent(boolean inclContext) {
+         try {
+             Intent intent = new Intent(Intent.ACTION_ASSIST);
++			/*hetian add */
++            ComponentName comp = getGlobalSearchActivity();
++            if(comp == null){
++            		return null;	
++            }
++            intent.setComponent(comp);
++			/*hetian add end*/
+             if (inclContext) {
+                 IActivityManager am = ActivityManagerNative.getDefault();
+                 Bundle extras = am.getAssistContextExtras(ActivityManager.ASSIST_CONTEXT_BASIC);
+diff --git a/alps/frameworks/base/core/res/res/values/config.xml b/alps/frameworks/base/core/res/res/values/config.xml
+index 699a513..2abd713 100755
+--- a/alps/frameworks/base/core/res/res/values/config.xml
++++ b/alps/frameworks/base/core/res/res/values/config.xml
+@@ -939,7 +939,7 @@
+          policy/src/com/android/internal/policy/impl/PhoneWindowManager.java
+     -->
+     <!-- M: Change default long press on home behavior to Recent apps view -->
+-    <integer name="config_longPressOnHomeBehavior">1</integer>
++    <integer name="config_longPressOnHomeBehavior">2</integer>
+ 
+     <!-- Control the behavior when the user double-taps the home button.
+             0 - Nothing
+diff --git a/alps/frameworks/base/services/core/java/com/android/server/policy/PhoneWindowManager.java b/alps/frameworks/base/services/core/java/com/android/server/policy/PhoneWindowManager.java
+index fc16170..3da8474 100755
+--- a/alps/frameworks/base/services/core/java/com/android/server/policy/PhoneWindowManager.java
++++ b/alps/frameworks/base/services/core/java/com/android/server/policy/PhoneWindowManager.java
+@@ -2854,9 +2854,23 @@ public class PhoneWindowManager implements WindowManagerPolicy {
+         } else if (keyCode == KeyEvent.KEYCODE_MENU) {
+             // Hijack modified menu keys for debugging features
+             final int chordBug = KeyEvent.META_SHIFT_ON;
++            
++            //tianyunfei 20150824 add for not show toggleRecentApps in some case begin
++            ActivityManager mActivityManager = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
++            ComponentName componentName = (mActivityManager.getRunningTasks(1).get(0)).topActivity;
++                       String className = componentName.getClassName();
++            Log.v("tianyunfei","className="+className);
++            if(win != null && win.getAttrs() != null){
++               Log.v("tianyunfei","win.getOwningPackage()="+win.getOwningPackage());
++                  if(win.getOwningPackage().equals("com.android.factory")){
++                          return 0;
++                 }
++            }
++            //tianyunfei 20150824 add for not show toggleRecentApps in some case end
+ 
+             if (down && repeatCount == 0) {
+-                if (mEnableShiftMenuBugReports && (metaState & chordBug) == chordBug) {
++               	/*tianyunfei 20150720 modify press menu key to recent apps begin*/
++                 /*if (mEnableShiftMenuBugReports && (metaState & chordBug) == chordBug) {
+                     Intent intent = new Intent(Intent.ACTION_BUG_REPORT);
+                     mContext.sendOrderedBroadcastAsUser(intent, UserHandle.CURRENT,
+                             null, null, null, 0, null, null);
+@@ -2876,8 +2890,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
+                     Settings.Global.putInt(
+                             res, Settings.Global.SHOW_PROCESSES, shown ? 0 : 1);
+                     return -1;
+-                }
++                }*/
++                toggleRecentApps();
++                /*tianyunfei 20150720 modify press menu key to recent apps end*/
+             }
++			return -1;//zgq 20151201 add,it must return something.
+         } else if (keyCode == KeyEvent.KEYCODE_SEARCH) {
+             if (down) {
+                 if (repeatCount == 0) {
+@@ -3234,6 +3251,18 @@ public class PhoneWindowManager implements WindowManagerPolicy {
+             ((SearchManager) mContext.getSystemService(Context.SEARCH_SERVICE))
+                     .launchLegacyAssist(hint, UserHandle.myUserId(), args);
+         } else {
++        		/*hetian*/
++        		Intent intent = ((SearchManager) mContext.getSystemService(Context.SEARCH_SERVICE)).getAssistIntent(true);
++        		if (intent != null) {
++        				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
++        				intent.setClassName("com.google.android.googlequicksearchbox","com.google.android.googlequicksearchbox.SearchActivity");
++		            try {
++		                mContext.startActivityAsUser(intent, UserHandle.CURRENT);
++		            } catch (ActivityNotFoundException e) {
++		                Slog.w(TAG, "No activity to handle assist action.", e);
++		            }
++        		}
++        		/**/
+             try {
+                 if (hint != null) {
+                     if (args == null) {
+-- 
+2.3.7
+

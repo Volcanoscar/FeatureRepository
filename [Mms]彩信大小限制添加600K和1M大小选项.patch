@@ -1,0 +1,215 @@
+From 953edc6a51b5a00b25be62133313c20d37712e23 Mon Sep 17 00:00:00 2001
+From: hetian <hetian@hkzechin.com>
+Date: Thu, 10 Mar 2016 13:01:04 +0800
+Subject: [PATCH] =?UTF-8?q?[BLU][Mms]=E5=BD=A9=E4=BF=A1=E5=A4=A7=E5=B0=8F?=
+ =?UTF-8?q?=E9=99=90=E5=88=B6=E6=B7=BB=E5=8A=A0600K=E5=92=8C1M=E5=A4=A7?=
+ =?UTF-8?q?=E5=B0=8F=E9=80=89=E9=A1=B9?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../proprietary/packages/apps/Mms/res/values-cs/mtk_arrays.xml   | 4 ++++
+ .../proprietary/packages/apps/Mms/res/values-el/mtk_arrays.xml   | 4 ++++
+ .../proprietary/packages/apps/Mms/res/values-hu/mtk_arrays.xml   | 4 ++++
+ .../proprietary/packages/apps/Mms/res/values-ro/mtk_arrays.xml   | 4 ++++
+ .../proprietary/packages/apps/Mms/res/values-tl/mtk_arrays.xml   | 4 ++++
+ .../proprietary/packages/apps/Mms/res/values/mtk_arrays.xml      | 4 ++++
+ .../proprietary/packages/apps/Mms/res/xml/mms_config.xml         | 6 +++---
+ .../packages/apps/Mms/src/com/android/mms/MmsConfig.java         | 6 +++---
+ .../packages/apps/Mms/src/com/android/mms/ui/MessageUtils.java   | 9 +++++++--
+ 9 files changed, 37 insertions(+), 8 deletions(-)
+ mode change 100644 => 100755 alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/mms_config.xml
+ mode change 100644 => 100755 alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/MessageUtils.java
+
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values-cs/mtk_arrays.xml b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values-cs/mtk_arrays.xml
+index 32ef0b0..daaf2e7 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values-cs/mtk_arrays.xml
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values-cs/mtk_arrays.xml
+@@ -41,11 +41,15 @@
+         <item>100K</item>
+         <item>200K</item>
+         <item>300K</item>
++        <item>600K</item>
++        <item>1M</item>
+     </string-array>
+     <string-array name="pref_mms_size_limit_values">
+         <item>100</item>
+         <item>200</item>
+         <item>300</item>
++        <item>600</item>
++        <item>1024</item>
+     </string-array>
+     <string-array name="pref_sms_save_location_choices">
+         <item>Telefon</item>
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values-el/mtk_arrays.xml b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values-el/mtk_arrays.xml
+index 895a5a5..7c1670c 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values-el/mtk_arrays.xml
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values-el/mtk_arrays.xml
+@@ -41,11 +41,15 @@
+         <item>100K</item>
+         <item>200K</item>
+         <item>300K</item>
++        <item>600K</item>
++        <item>1M</item>
+     </string-array>
+     <string-array name="pref_mms_size_limit_values">
+         <item>100</item>
+         <item>200</item>
+         <item>300</item>
++        <item>600</item>
++        <item>1024</item>
+     </string-array>
+     <string-array name="pref_sms_save_location_choices">
+         <item>Τηλέφωνο</item>
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values-hu/mtk_arrays.xml b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values-hu/mtk_arrays.xml
+index 1f9c112..e7adf91 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values-hu/mtk_arrays.xml
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values-hu/mtk_arrays.xml
+@@ -36,11 +36,15 @@
+         <item>100K</item>
+         <item>200K</item>
+         <item>300K</item>
++        <item>600K</item>
++        <item>1M</item>
+     </string-array>
+     <string-array name="pref_mms_size_limit_values">
+         <item>100</item>
+         <item>200</item>
+         <item>300</item>
++        <item>600</item>
++        <item>1024</item>
+     </string-array>
+     <string-array name="pref_key_mms_priority_choices">
+         <item>Magas</item>
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values-ro/mtk_arrays.xml b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values-ro/mtk_arrays.xml
+index 5374879..e320be6 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values-ro/mtk_arrays.xml
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values-ro/mtk_arrays.xml
+@@ -36,11 +36,15 @@
+         <item>100 K</item>
+         <item>200 K</item>
+         <item>300 K</item>
++        <item>600 K</item>
++        <item>1 M</item>
+     </string-array>
+     <string-array name="pref_mms_size_limit_values">
+         <item>100</item>
+         <item>200</item>
+         <item>300</item>
++        <item>600</item>
++        <item>1024</item>
+     </string-array>
+     <string-array name="pref_key_mms_priority_choices">
+         <item>Înaltă</item>
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values-tl/mtk_arrays.xml b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values-tl/mtk_arrays.xml
+index bb8379c..203be4f 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values-tl/mtk_arrays.xml
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values-tl/mtk_arrays.xml
+@@ -38,11 +38,15 @@
+         <item>100K</item>
+         <item>200K</item>
+         <item>300K</item>
++        <item>600K</item>
++        <item>1M</item>
+     </string-array>
+     <string-array name="pref_mms_size_limit_values">
+         <item>100</item>
+         <item>200</item>
+         <item>300</item>
++        <item>600</item>
++        <item>1024</item>
+     </string-array>
+     <string-array name="pref_key_mms_priority_choices">
+         <item>Mataas</item>
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values/mtk_arrays.xml b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values/mtk_arrays.xml
+index da3f0dc..ac88375 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values/mtk_arrays.xml
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/values/mtk_arrays.xml
+@@ -44,11 +44,15 @@
+         <item>100K</item>
+         <item>200K</item>
+         <item>300K</item>
++        <item>600K</item>
++        <item>1M</item>
+     </string-array>
+     <string-array name="pref_mms_size_limit_values" translatable="false">
+         <item>100</item>
+         <item>200</item>
+         <item>300</item>
++        <item>600</item>
++        <item>1024</item>
+     </string-array>  
+     <string-array name="pref_key_mms_priority_choices">
+         <item>High</item>
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/mms_config.xml b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/mms_config.xml
+old mode 100644
+new mode 100755
+index 3e87525..81e3190
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/mms_config.xml
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/res/xml/mms_config.xml
+@@ -26,13 +26,13 @@
+     <bool name="enabledMMS">true</bool>
+ 
+     <!-- Maximum message size in bytes for a MMS message -->
+-    <int name="maxMessageSize">307200</int>
++    <int name="maxMessageSize">1024000</int>
+ 
+     <!-- Maximum height for an attached image -->
+-    <int name="maxImageHeight">480</int>
++    <int name="maxImageHeight">3600</int>
+ 
+     <!-- Maximum width for an attached image -->
+-    <int name="maxImageWidth">640</int>
++    <int name="maxImageWidth">3600</int>
+ 
+     <!-- Maximum number of SMS message to save per thread before auto-delete kicks in.
+          This is the default value. -->
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/MmsConfig.java b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/MmsConfig.java
+index 590e8f0..215a6df 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/MmsConfig.java
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/MmsConfig.java
+@@ -87,15 +87,15 @@ public class MmsConfig {
+ 
+     private static final String SMS_PROMO_DISMISSED_KEY = "sms_promo_dismissed_key";
+     ///@}
+-    private static final int MAX_IMAGE_HEIGHT = 480;
+-    private static final int MAX_IMAGE_WIDTH  = 640;
++    private static final int MAX_IMAGE_HEIGHT = 3600;
++    private static final int MAX_IMAGE_WIDTH  = 3600;
+ 
+     /**
+      * Whether to hide MMS functionality from the user (i.e. SMS only).
+      */
+     private static boolean mTransIdEnabled = false;
+     private static int mMmsEnabled = 1;                         // default to true
+-    private static int mMaxMessageSize = 300 * 1024;            // default to 300k max size
++    private static int mMaxMessageSize = 1024 * 1024;            // default to 300k max siz
+     private static String mUserAgent = DEFAULT_USER_AGENT;
+     private static String mUaProfTagName = DEFAULT_HTTP_KEY_X_WAP_PROFILE;
+     private static String mUaProfUrl = null;
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/MessageUtils.java b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/MessageUtils.java
+old mode 100644
+new mode 100755
+index 0aa9025..16f3067
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/MessageUtils.java
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/MessageUtils.java
+@@ -3066,8 +3066,13 @@ public class MessageUtils {
+             mMmsSizeLimit = 100;
+         } else if (mSizeLimitTemp != null && 0 == mSizeLimitTemp.compareTo("200")) {
+             mMmsSizeLimit = 200;
+-        } else {
+-            mMmsSizeLimit = 300;
++        } else if (mSizeLimitTemp != null && 0 == mSizeLimitTemp.compareTo("300")) {
++             mMmsSizeLimit = 300;
++       //lilong 20141215 modify for requirement,add the mms size 600K and 1M
++        } else if (mSizeLimitTemp != null && 0 == mSizeLimitTemp.compareTo("600")) {
++            mMmsSizeLimit = 600;
++        }else {
++            mMmsSizeLimit = 1024;
+         }
+         MmsConfig.setUserSetMmsSizeLimit(mMmsSizeLimit);
+     }
+-- 
+2.3.7
+

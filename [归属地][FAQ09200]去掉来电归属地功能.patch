@@ -1,0 +1,84 @@
+From 30399d3975216cdd217ea2f7208ff55725586e8e Mon Sep 17 00:00:00 2001
+From: tianyunfei <tianyunfei@hkzechin.com>
+Date: Tue, 20 Oct 2015 11:42:25 +0800
+Subject: [PATCH] =?UTF-8?q?[BLU][=E5=BD=92=E5=B1=9E=E5=9C=B0][FAQ09200]?=
+ =?UTF-8?q?=E5=8E=BB=E6=8E=89=E6=9D=A5=E7=94=B5=E5=BD=92=E5=B1=9E=E5=9C=B0?=
+ =?UTF-8?q?=E5=8A=9F=E8=83=BD?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../java/com/android/internal/telephony/CallerInfo.java        |  3 ++-
+ .../apps/InCallUI/src/com/android/incallui/CallerInfo.java     |  3 ++-
+ .../providers/contacts/DefaultCallLogInsertionHelper.java      | 10 +++++++---
+ 3 files changed, 11 insertions(+), 5 deletions(-)
+ mode change 100644 => 100755 alps/frameworks/base/telephony/java/com/android/internal/telephony/CallerInfo.java
+ mode change 100644 => 100755 alps/packages/apps/InCallUI/src/com/android/incallui/CallerInfo.java
+ mode change 100644 => 100755 alps/packages/providers/ContactsProvider/src/com/android/providers/contacts/DefaultCallLogInsertionHelper.java
+
+diff --git a/alps/frameworks/base/telephony/java/com/android/internal/telephony/CallerInfo.java b/alps/frameworks/base/telephony/java/com/android/internal/telephony/CallerInfo.java
+old mode 100644
+new mode 100755
+index b3ae981..7644ab0
+--- a/alps/frameworks/base/telephony/java/com/android/internal/telephony/CallerInfo.java
++++ b/alps/frameworks/base/telephony/java/com/android/internal/telephony/CallerInfo.java
+@@ -622,7 +622,8 @@ public class CallerInfo {
+      */
+     public void updateGeoDescription(Context context, String fallbackNumber) {
+         String number = TextUtils.isEmpty(phoneNumber) ? fallbackNumber : phoneNumber;
+-        geoDescription = getGeoDescription(context, number);
++        //geoDescription = getGeoDescription(context, number);
++        geoDescription = null;//tianyunfei 20150924 modify for delete incall number location
+     }
+ 
+     /**
+diff --git a/alps/packages/apps/InCallUI/src/com/android/incallui/CallerInfo.java b/alps/packages/apps/InCallUI/src/com/android/incallui/CallerInfo.java
+old mode 100644
+new mode 100755
+index 26bafa6..37ed830
+--- a/alps/packages/apps/InCallUI/src/com/android/incallui/CallerInfo.java
++++ b/alps/packages/apps/InCallUI/src/com/android/incallui/CallerInfo.java
+@@ -496,7 +496,8 @@ public class CallerInfo {
+     */
+     public void updateGeoDescription(Context context, String fallbackNumber, int subId) {
+         String number = TextUtils.isEmpty(phoneNumber) ? fallbackNumber : phoneNumber;
+-        geoDescription = getGeoDescription(context, number, subId);
++       // geoDescription = getGeoDescription(context, number, subId);
++       geoDescription = null;//tianyunfei 20150924 modify for delete incall number location
+     }
+ 
+     /**
+diff --git a/alps/packages/providers/ContactsProvider/src/com/android/providers/contacts/DefaultCallLogInsertionHelper.java b/alps/packages/providers/ContactsProvider/src/com/android/providers/contacts/DefaultCallLogInsertionHelper.java
+old mode 100644
+new mode 100755
+index e784d1e..69dfc05
+--- a/alps/packages/providers/ContactsProvider/src/com/android/providers/contacts/DefaultCallLogInsertionHelper.java
++++ b/alps/packages/providers/ContactsProvider/src/com/android/providers/contacts/DefaultCallLogInsertionHelper.java
+@@ -140,7 +140,8 @@ import java.util.Set;
+             String cityName = geoCodingQuery.queryByNumber(number);
+             Log.d(TAG, "[GeoCodingQuery] cityName = " + cityName);
+             if (!TextUtils.isEmpty(cityName)) {
+-                return cityName;
++                //return cityName;
++                return null;//tianyunfei 20150924 modify for delete incall number location
+             }
+         }
+         /// @}
+@@ -151,8 +152,11 @@ import java.util.Set;
+             return getPhoneNumberOfflineGeocoder().getDescriptionForNumber(
+                     structuredPhoneNumber, mLocale);
+              */
+-            return getPhoneNumberOfflineGeocoder().getDescriptionForNumber(
+-                    structuredPhoneNumber, mContext.getResources().getConfiguration().locale);
++            //tianyunfei 20150924 modify for delete incall number location begin
++            //return getPhoneNumberOfflineGeocoder().getDescriptionForNumber(
++            //        structuredPhoneNumber, mContext.getResources().getConfiguration().locale);
++            return null;
++            //tianyunfei 20150924 modify for delete incall number location end
+         } else {
+             return null;
+         }
+-- 
+2.3.7
+

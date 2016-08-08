@@ -1,0 +1,202 @@
+From 933f223b58f82dad69f9018725801eec258a7752 Mon Sep 17 00:00:00 2001
+From: hetian <hetian@hkzechin.com>
+Date: Fri, 11 Mar 2016 19:48:45 +0800
+Subject: [PATCH] =?UTF-8?q?[BLU][Storage]=E5=BD=93storage=E5=B0=91?=
+ =?UTF-8?q?=E4=BA=8E200MB=E6=97=B6=E5=BC=B9=E5=87=BA=E4=BD=8E=E5=AE=B9?=
+ =?UTF-8?q?=E9=87=8F=E6=8F=90=E7=A4=BA?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../storage/DeviceStorageMonitorService.java       | 23 ++++++++++++++++++++++
+ .../base/res/res/values-en-rGB/strings.xml         |  5 +++++
+ .../base/res/res/values-en-rUS/strings.xml         |  7 ++++++-
+ .../frameworks/base/res/res/values-es/strings.xml  |  5 +++++
+ .../base/res/res/values-pt-rPT/strings.xml         |  5 +++++
+ .../frameworks/base/res/res/values-pt/strings.xml  |  5 +++++
+ .../frameworks/base/res/res/values/public.xml      |  5 +++++
+ .../frameworks/base/res/res/values/strings.xml     |  5 +++++
+ 8 files changed, 59 insertions(+), 1 deletion(-)
+ mode change 100644 => 100755 alps/frameworks/base/services/core/java/com/android/server/storage/DeviceStorageMonitorService.java
+ mode change 100644 => 100755 alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-en-rGB/strings.xml
+ mode change 100644 => 100755 alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-en-rUS/strings.xml
+ mode change 100644 => 100755 alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-es/strings.xml
+ mode change 100644 => 100755 alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-pt-rPT/strings.xml
+ mode change 100644 => 100755 alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-pt/strings.xml
+ mode change 100644 => 100755 alps/vendor/mediatek/proprietary/frameworks/base/res/res/values/strings.xml
+
+diff --git a/alps/frameworks/base/services/core/java/com/android/server/storage/DeviceStorageMonitorService.java b/alps/frameworks/base/services/core/java/com/android/server/storage/DeviceStorageMonitorService.java
+old mode 100644
+new mode 100755
+index 46342d4..f5c342f
+--- a/alps/frameworks/base/services/core/java/com/android/server/storage/DeviceStorageMonitorService.java
++++ b/alps/frameworks/base/services/core/java/com/android/server/storage/DeviceStorageMonitorService.java
+@@ -103,6 +103,7 @@ public class DeviceStorageMonitorService extends SystemService {
+ 
+     static final int DEVICE_MEMORY_WHAT = 1;
+     static final int DEVICE_MEMORY_CRITICAL_LOW = 2; // For low storage dialog show
++    private static final int DEVICE_ZX_MEMORY_CRITICAL_LOW = 3;//hetian add for low storage 20160311
+ 
+     private static final int MONITOR_INTERVAL = 1; //in minutes
+     private static final int LOW_MEMORY_NOTIFICATION_ID = 1;
+@@ -121,6 +122,7 @@ public class DeviceStorageMonitorService extends SystemService {
+     private long mLastReportedFreeMem;
+     private long mLastReportedFreeMemTime;
+     boolean mLowMemFlag=false;
++    private static boolean mZxLowMemFlag = false;//hetian add for low storage 20160311
+     private boolean mMemFullFlag=false;
+     private final boolean mIsBootImageOnDisk;
+     private final ContentResolver mResolver;
+@@ -245,6 +247,18 @@ public class DeviceStorageMonitorService extends SystemService {
+                     }
+                 }
+                 return;
++            /*hetian add start for low storage 20160311*/ 
++            }else if(msg.what == DEVICE_ZX_MEMORY_CRITICAL_LOW){
++            		final Context context = getContext();
++                AlertDialog.Builder builder = new AlertDialog.Builder(context)
++                .setIcon(com.android.internal.R.drawable.ic_dialog_alert)
++                .setTitle(context.getText(com.mediatek.R.string.low_internal_storage_zx_title))
++                .setMessage(context.getText(com.mediatek.R.string.low_storage_warning_zx_message))
++                .setNegativeButton(context.getText(com.mediatek.R.string.low_internal_storage_zx_btn), null);
++                mDialog = builder.create();
++                mDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
++                mDialog.show();
++            /*hetian add end for low storage 20160311*/ 
+             }
+             // /@}
+             //don't handle an invalid message
+@@ -336,6 +350,15 @@ public class DeviceStorageMonitorService extends SystemService {
+     }
+ 
+     void checkMemory(boolean checkCache) {
++    		// hk 20150914 add for requirement
++       if(mFreeMem > 0 && mFreeMem < (long) (200 * 1024 * 1024)  ){
++           if(!mZxLowMemFlag){
++               mZxLowMemFlag = true ;
++               mHandler.sendMessage(mHandler.obtainMessage(DEVICE_ZX_MEMORY_CRITICAL_LOW));
++           }
++        }else {
++        		mZxLowMemFlag = false ;
++        }
+         //if the thread that was started to clear cache is still running do nothing till its
+         //finished clearing cache. Ideally this flag could be modified by clearCache
+         // and should be accessed via a lock but even if it does this test will fail now and
+diff --git a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-en-rGB/strings.xml b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-en-rGB/strings.xml
+old mode 100644
+new mode 100755
+index a543e2c..37c74d7
+--- a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-en-rGB/strings.xml
++++ b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-en-rGB/strings.xml
+@@ -341,4 +341,9 @@
+     <string name="usb_cd_installer_notification_title">"Connected as an installer"</string>
+     <string name="aerr_application_permission">\"<xliff:g id="err_ap_name">%1$s</xliff:g>\" failed to access <xliff:g id="permission_name">%2$s</xliff:g>, allow?</string>
+     <string name="denied_required_permission">Some permissions denied. You can change them in Settings &gt; Apps.</string>
++    <!-- hk 20150914 add for requirement  -->
++    <string name="low_internal_storage_zx_title">Low Internal Storage Space</string>
++    <string name="low_storage_warning_zx_message">The internal storage space is below 200M.Please free up some space, or some applications and system functions may not work well.</string>
++    <string name="low_internal_storage_zx_btn">OK</string>
++    <!-- hk 20150914 add end for requirement  -->
+ </resources>
+diff --git a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-en-rUS/strings.xml b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-en-rUS/strings.xml
+old mode 100644
+new mode 100755
+index 8b567b0..a6cd307
+--- a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-en-rUS/strings.xml
++++ b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-en-rUS/strings.xml
+@@ -1498,5 +1498,10 @@
+     <string name="lock_to_app_toast_without_navbar">To unpin this screen, please touch and hold Back key.</string>
+     <string name="ext_media_status_shared">Shared</string>
+     <string name="aerr_application_permission">\"<xliff:g id="err_ap_name">%1$s</xliff:g>\" failed to access your <xliff:g id="permission_name">%2$s</xliff:g>, allow the permission?</string>
+-    <string name="denied_required_permission">Permissions denied. You can change them in Settings &gt; Apps.</string>
++    <string name="denied_required_permission">Permissions denied. You can change them in Settings &gt; Apps.</string>
++    <!-- hk 20150914 add for requirement  -->
++    <string name="low_internal_storage_zx_title">Low Internal Storage Space</string>
++    <string name="low_storage_warning_zx_message">The internal storage space is below 200M.Please free up some space, or some applications and system functions may not work well.</string>
++    <string name="low_internal_storage_zx_btn">OK</string>
++    <!-- hk 20150914 add end for requirement  -->
+ </resources>
+diff --git a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-es/strings.xml b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-es/strings.xml
+old mode 100644
+new mode 100755
+index f8e6631..6ff9cbd
+--- a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-es/strings.xml
++++ b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-es/strings.xml
+@@ -346,4 +346,9 @@
+     <string name="reboot_confirm_gt" product="default">"El teléfono se reiniciará."</string>
+     <string name="reboot_confirm_gt_title" product="default">"Reiniciar"</string>
+     <!--hetian add end for PP-7 add power reboot -->
++    <!-- hk 20150914 add for requirement  -->
++    <string name="low_internal_storage_zx_title">Low Internal Storage Space</string>
++    <string name="low_storage_warning_zx_message">The internal storage space is below 200M.Please free up some space, or some applications and system functions may not work well.</string>
++    <string name="low_internal_storage_zx_btn">OK</string>
++    <!-- hk 20150914 add end for requirement  -->
+ </resources>
+diff --git a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-pt-rPT/strings.xml b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-pt-rPT/strings.xml
+old mode 100644
+new mode 100755
+index b701f8b..7dfe59f
+--- a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-pt-rPT/strings.xml
++++ b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-pt-rPT/strings.xml
+@@ -302,4 +302,9 @@
+     <string name="reboot_confirm_gt" product="default">"Telefone irá reiniciar."</string>
+     <string name="reboot_confirm_gt_title" product="default">"Reiniciar"</string>
+     <!--hetian add end for PP-7 add power reboot -->
++    <!-- hk 20150914 add for requirement  -->
++    <string name="low_internal_storage_zx_title">Espaço baixo Armazenamento interno</string>
++    <string name="low_storage_warning_zx_message">El espacio interno de almacenamiento es inferior a 200M.Libere espaço, ou alguns aplicativos e funções do sistema podem não funcionar corretamente.</string>
++    <string name="low_internal_storage_zx_btn">OK</string>
++    <!-- hk 20150914 add end for requirement  -->
+ </resources>
+diff --git a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-pt/strings.xml b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-pt/strings.xml
+old mode 100644
+new mode 100755
+index 3878b1f..595582d
+--- a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-pt/strings.xml
++++ b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-pt/strings.xml
+@@ -341,4 +341,9 @@
+     <string name="usb_cd_installer_notification_title">"Conectados como um instalador"</string>
+     <string name="aerr_application_permission">\"<xliff:g id="err_ap_name">%1$s</xliff:g>\" falhu ao acessar seu <xliff:g id="permission_name">%2$s</xliff:g>, permitir?</string>
+     <string name="denied_required_permission">Permissão recusada. Você pode altrá-las em Configurações &gt; Aplicativos.</string>
++    <!-- hk 20150914 add for requirement  -->
++    <string name="low_internal_storage_zx_title">Espaço baixo Armazenamento interno</string>
++    <string name="low_storage_warning_zx_message">El espacio interno de almacenamiento es inferior a 200M.Libere espaço, ou alguns aplicativos e funções do sistema podem não funcionar corretamente.</string>
++    <string name="low_internal_storage_zx_btn">OK</string>
++    <!-- hk 20150914 add end for requirement  -->
+ </resources>
+diff --git a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values/public.xml b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values/public.xml
+index cf2d86e..074ee19 100755
+--- a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values/public.xml
++++ b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values/public.xml
+@@ -261,5 +261,10 @@
+   <public type="string" name="denied_required_permission" id="0x08050124"/>
+   <!--hetian add zzzzz_ic_lock_power_reboot-->
+   <public type="drawable" name="zzzzz_ic_lock_power_reboot"/>
++  <!--zgq add begin-->
++  <public type="string" name="low_internal_storage_zx_title" id="0x080500e0"/>
++  <public type="string" name="low_storage_warning_zx_message" id="0x080500e1"/>
++  <public type="string" name="low_internal_storage_zx_btn" id="0x080500e2"/>
++  <!--zgq add end-->
+ 
+ </resources>
+diff --git a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values/strings.xml b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values/strings.xml
+old mode 100644
+new mode 100755
+index 805d679..867ed16
+--- a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values/strings.xml
++++ b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values/strings.xml
+@@ -524,5 +524,10 @@
+     <string name="reboot_confirm_gt" product="default">"The phone will reboot."</string>
+     <string name="reboot_confirm_gt_title" product="default">"Reboot"</string>
+     <!-- hetian add end for PP-7 add power reboot -->
++    <!-- hk 20150914 add for requirement  -->
++    <string name="low_internal_storage_zx_title">Low Internal Storage Space</string>
++    <string name="low_storage_warning_zx_message">The internal storage space is below 200M.Please free up some space, or some applications and system functions may not work well.</string>
++    <string name="low_internal_storage_zx_btn">OK</string>
++    <!-- hk 20150914 add end for requirement  -->
+ 
+ </resources>
+-- 
+2.3.7
+

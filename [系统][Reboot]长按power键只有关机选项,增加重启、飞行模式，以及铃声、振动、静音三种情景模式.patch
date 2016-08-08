@@ -1,0 +1,488 @@
+From d17ff1196c6ac8b87f0e214e3ecd6fbae82f3946 Mon Sep 17 00:00:00 2001
+From: liubinyang <liubinyang@hkzechin.com>
+Date: Mon, 1 Feb 2016 13:41:38 +0800
+Subject: [PATCH] =?UTF-8?q?[=E5=B9=B3=E5=8F=B0][=E7=B3=BB=E7=BB=9F][Reboot?=
+ =?UTF-8?q?]=E9=95=BF=E6=8C=89power=E9=94=AE=E5=8F=AA=E6=9C=89=E5=85=B3?=
+ =?UTF-8?q?=E6=9C=BA=E9=80=89=E9=A1=B9,=E5=A2=9E=E5=8A=A0=E9=87=8D?=
+ =?UTF-8?q?=E5=90=AF=E3=80=81=E9=A3=9E=E8=A1=8C=E6=A8=A1=E5=BC=8F=EF=BC=8C?=
+ =?UTF-8?q?=E4=BB=A5=E5=8F=8A=E9=93=83=E5=A3=B0=E3=80=81=E6=8C=AF=E5=8A=A8?=
+ =?UTF-8?q?=E3=80=81=E9=9D=99=E9=9F=B3=E4=B8=89=E7=A7=8D=E6=83=85=E6=99=AF?=
+ =?UTF-8?q?=E6=A8=A1=E5=BC=8F?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../java/android/view/WindowManagerPolicy.java     |   3 ++
+ .../frameworks/base/core/res/res/values/config.xml |   3 ++
+ .../android/server/notification/ZenModeHelper.java |   7 ++--
+ .../com/android/server/policy/GlobalActions.java   |  38 ++++++++++++++++++---
+ .../com/android/server/power/ShutdownThread.java   |  12 +++++--
+ .../android/server/wm/WindowManagerService.java    |   6 ++++
+ .../drawable-hdpi/zzzzz_ic_lock_power_reboot.png   | Bin 0 -> 1757 bytes
+ .../drawable-xhdpi/zzzzz_ic_lock_power_reboot.png  | Bin 0 -> 1757 bytes
+ .../frameworks/base/res/res/values-de/strings.xml  |   6 ++++
+ .../base/res/res/values-es-rUS/strings.xml         |   6 ++++
+ .../frameworks/base/res/res/values-es/strings.xml  |   6 ++++
+ .../frameworks/base/res/res/values-fr/strings.xml  |   5 +++
+ .../base/res/res/values-pt-rPT/strings.xml         |   5 +++
+ .../base/res/res/values-zh-rCN/strings.xml         |   5 +++
+ .../base/res/res/values-zh-rHK/strings.xml         |   5 +++
+ .../base/res/res/values-zh-rTW/strings.xml         |   5 +++
+ .../frameworks/base/res/res/values/public.xml      |   3 ++
+ .../frameworks/base/res/res/values/strings.xml     |   5 +++
+ .../frameworks/base/res/res/values/symbols.xml     |   5 +++
+ 19 files changed, 115 insertions(+), 10 deletions(-)
+ mode change 100644 => 100755 alps/frameworks/base/core/java/android/view/WindowManagerPolicy.java
+ mode change 100644 => 100755 alps/frameworks/base/core/res/res/values/config.xml
+ mode change 100644 => 100755 alps/frameworks/base/services/core/java/com/android/server/notification/ZenModeHelper.java
+ mode change 100644 => 100755 alps/frameworks/base/services/core/java/com/android/server/policy/GlobalActions.java
+ mode change 100644 => 100755 alps/frameworks/base/services/core/java/com/android/server/power/ShutdownThread.java
+ mode change 100644 => 100755 alps/frameworks/base/services/core/java/com/android/server/wm/WindowManagerService.java
+ create mode 100755 alps/vendor/mediatek/proprietary/frameworks/base/res/res/drawable-hdpi/zzzzz_ic_lock_power_reboot.png
+ create mode 100755 alps/vendor/mediatek/proprietary/frameworks/base/res/res/drawable-xhdpi/zzzzz_ic_lock_power_reboot.png
+ mode change 100644 => 100755 alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-zh-rCN/strings.xml
+ mode change 100644 => 100755 alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-zh-rTW/strings.xml
+
+diff --git a/alps/frameworks/base/core/java/android/view/WindowManagerPolicy.java b/alps/frameworks/base/core/java/android/view/WindowManagerPolicy.java
+old mode 100644
+new mode 100755
+index c615390..eb6493a
+--- a/alps/frameworks/base/core/java/android/view/WindowManagerPolicy.java
++++ b/alps/frameworks/base/core/java/android/view/WindowManagerPolicy.java
+@@ -494,6 +494,9 @@ public interface WindowManagerPolicy {
+ 
+         public void shutdown(boolean confirm);
+         public void rebootSafeMode(boolean confirm);
++        /*hetian add begin for PP-7 add power reboot 20150831*/
++        public void reboot(boolean confirm);
++        /*hetian add end for PP-7 add power reboot 20150831*/
+ 
+         /**
+          * Return the window manager lock needed to correctly call "Lw" methods.
+diff --git a/alps/frameworks/base/core/res/res/values/config.xml b/alps/frameworks/base/core/res/res/values/config.xml
+old mode 100644
+new mode 100755
+index f2dc4bb..699a513
+--- a/alps/frameworks/base/core/res/res/values/config.xml
++++ b/alps/frameworks/base/core/res/res/values/config.xml
+@@ -2032,6 +2032,9 @@
+         <item>power</item>
+         <item>bugreport</item>
+         <item>users</item>
++        <item>reboot</item>
++        <item>airplane</item>
++        <item>silent</item>
+     </string-array>
+ 
+     <!-- Number of milliseconds to hold a wake lock to ensure that drawing is fully
+diff --git a/alps/frameworks/base/services/core/java/com/android/server/notification/ZenModeHelper.java b/alps/frameworks/base/services/core/java/com/android/server/notification/ZenModeHelper.java
+old mode 100644
+new mode 100755
+index 57d7758..a3f558b
+--- a/alps/frameworks/base/services/core/java/com/android/server/notification/ZenModeHelper.java
++++ b/alps/frameworks/base/services/core/java/com/android/server/notification/ZenModeHelper.java
+@@ -640,8 +640,11 @@ public class ZenModeHelper {
+                         if (mZenMode == Global.ZEN_MODE_OFF) {
+                             newZen = Global.ZEN_MODE_ALARMS;
+                         }
+-                        ringerModeInternalOut = isVibrate ? AudioManager.RINGER_MODE_VIBRATE
+-                                : AudioManager.RINGER_MODE_SILENT;
++						/* hetian add start for PP-7 add power reboot */
++                        //ringerModeInternalOut = isVibrate ? AudioManager.RINGER_MODE_VIBRATE
++                        //        : AudioManager.RINGER_MODE_SILENT;
++						ringerModeInternalOut = AudioManager.RINGER_MODE_SILENT;
++						/* hetian add end for PP-7 add power reboot */
+                     } else {
+                         ringerModeInternalOut = ringerModeInternal;
+                     }
+diff --git a/alps/frameworks/base/services/core/java/com/android/server/policy/GlobalActions.java b/alps/frameworks/base/services/core/java/com/android/server/policy/GlobalActions.java
+old mode 100644
+new mode 100755
+index 3cee927..eac63b9
+--- a/alps/frameworks/base/services/core/java/com/android/server/policy/GlobalActions.java
++++ b/alps/frameworks/base/services/core/java/com/android/server/policy/GlobalActions.java
+@@ -93,6 +93,9 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
+     /* Valid settings for global actions keys.
+      * see config.xml config_globalActionList */
+     private static final String GLOBAL_ACTION_KEY_POWER = "power";
++    /* hetian add start for PP-7 add power reboot */
++    private static final String GLOBAL_ACTION_KEY_REBOOT = "reboot";
++    /* hetian add start for PP-7 add power reboot */
+     private static final String GLOBAL_ACTION_KEY_AIRPLANE = "airplane";
+     private static final String GLOBAL_ACTION_KEY_BUGREPORT = "bugreport";
+     private static final String GLOBAL_ACTION_KEY_SILENT = "silent";
+@@ -240,7 +243,9 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
+ 
+             @Override
+             protected void changeStateFromPress(boolean buttonOn) {
+-                if (!mHasTelephony) return;
++                /* hetian modify start for PP-7 add power reboot */
++                //if (!mHasTelephony) return;
++                /* hetian modify end for PP-7 add power reboot */
+ 
+                 // In ECM mode airplane state cannot be changed
+                 if (!(Boolean.parseBoolean(
+@@ -273,6 +278,23 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
+             }
+             if (GLOBAL_ACTION_KEY_POWER.equals(actionKey)) {
+                 mItems.add(new PowerAction());
++                /*  hetian add start for PP-7 add power reboot */
++            }else if (GLOBAL_ACTION_KEY_REBOOT.equals(actionKey)) {
++              mItems.add(
++                  new SinglePressAction(com.mediatek.internal.R.drawable.zzzzz_ic_lock_power_reboot, com.mediatek.internal.R.string.zzzzz_global_action_power_reboot) {
++                       public void onPress() {
++                               mWindowManagerFuncs.reboot(true);
++                       }
++
++                               public boolean showDuringKeyguard() {
++                                       return true;
++                               }
++
++                               public boolean showBeforeProvisioning() {
++                                       return true;
++                               }
++                               });
++            /*  hetian add end for PP-7 add power reboot */
+             } else if (GLOBAL_ACTION_KEY_AIRPLANE.equals(actionKey)) {
+                 mItems.add(mAirplaneModeOn);
+             } else if (GLOBAL_ACTION_KEY_BUGREPORT.equals(actionKey)) {
+@@ -1047,7 +1069,9 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
+     PhoneStateListener mPhoneStateListener = new PhoneStateListener() {
+         @Override
+         public void onServiceStateChanged(ServiceState serviceState) {
+-            if (!mHasTelephony) return;
++            /* hetian modify start for PP-7 add power reboot */
++            //if (!mHasTelephony) return;
++            /* hetian modify end for PP-7 add power reboot */
+             final boolean inAirplaneMode = serviceState.getState() == ServiceState.STATE_POWER_OFF;
+             mAirplaneState = inAirplaneMode ? ToggleAction.State.On : ToggleAction.State.Off;
+             mAirplaneModeOn.updateState(mAirplaneState);
+@@ -1098,7 +1122,9 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
+ 
+     private void onAirplaneModeChanged() {
+         // Let the service state callbacks handle the state.
+-        if (mHasTelephony) return;
++       /* hetian modify start for PP-7 add power reboot */
++        //if (mHasTelephony) return;
++        /* hetian modify end for PP-7 add power reboot */
+ 
+         boolean airplaneModeOn = Settings.Global.getInt(
+                 mContext.getContentResolver(),
+@@ -1120,9 +1146,11 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
+         intent.addFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING);
+         intent.putExtra("state", on);
+         mContext.sendBroadcastAsUser(intent, UserHandle.ALL);
+-        if (!mHasTelephony) {
++        /* hetian modify start for PP-7 add power reboot */
++        //if (!mHasTelephony) {
+             mAirplaneState = on ? ToggleAction.State.On : ToggleAction.State.Off;
+-        }
++        //}
++        /* hetian modify end for PP-7 add power reboot */
+     }
+ 
+     private static final class GlobalActionsDialog extends Dialog implements DialogInterface {
+diff --git a/alps/frameworks/base/services/core/java/com/android/server/power/ShutdownThread.java b/alps/frameworks/base/services/core/java/com/android/server/power/ShutdownThread.java
+old mode 100644
+new mode 100755
+index 176e00b..609d61d
+--- a/alps/frameworks/base/services/core/java/com/android/server/power/ShutdownThread.java
++++ b/alps/frameworks/base/services/core/java/com/android/server/power/ShutdownThread.java
+@@ -75,7 +75,9 @@ import java.io.BufferedReader;
+ import java.io.File;
+ import java.io.FileReader;
+ import java.io.IOException;
+-
++/* hetian add start for PP-7 add power reboot */
++import com.mediatek.internal.R;
++/* hetian add end for PP-7 add power reboot */
+ public final class ShutdownThread extends Thread {
+     // constants
+     private static final String TAG = "ShutdownThread";
+@@ -219,11 +221,15 @@ public final class ShutdownThread extends Thread {
+ 
+         final int longPressBehavior = context.getResources().getInteger(
+                         com.android.internal.R.integer.config_longPressOnPowerBehavior);
+-        final int resourceId = mRebootSafeMode
++        /* hetian modify start for PP-7 add power reboot */
++        //final int resourceId = mRebootSafeMode
++        final int resourceId = mReboot?com.mediatek.internal.R.string.reboot_confirm_gt:(mRebootSafeMode
+                 ? com.android.internal.R.string.reboot_safemode_confirm
+                 : (longPressBehavior == 2
+                         ? com.android.internal.R.string.shutdown_confirm_question
+-                        : com.android.internal.R.string.shutdown_confirm);
++                        //: com.android.internal.R.string.shutdown_confirm);
++                        : com.android.internal.R.string.shutdown_confirm));
++        /* hetian modify end for PP-7 add power reboot */
+ 
+         Log.d(TAG, "Notifying thread to start shutdown longPressBehavior=" + longPressBehavior);
+ 
+diff --git a/alps/frameworks/base/services/core/java/com/android/server/wm/WindowManagerService.java b/alps/frameworks/base/services/core/java/com/android/server/wm/WindowManagerService.java
+old mode 100644
+new mode 100755
+index c240525..11404ee
+--- a/alps/frameworks/base/services/core/java/com/android/server/wm/WindowManagerService.java
++++ b/alps/frameworks/base/services/core/java/com/android/server/wm/WindowManagerService.java
+@@ -5998,6 +5998,12 @@ public class WindowManagerService extends IWindowManager.Stub
+     public void rebootSafeMode(boolean confirm) {
+         ShutdownThread.rebootSafeMode(mContext, confirm);
+     }
++    /* hetian add start for PP-7 add power reboot */
++    @Override
++        public void reboot(boolean confirm) {
++			ShutdownThread.reboot(mContext,null,confirm);
++        }
++    /*  hetian add end for PP-7 add power reboot */
+ 
+     public void setCurrentProfileIds(final int[] currentProfileIds) {
+         synchronized (mWindowMap) {
+diff --git a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/drawable-hdpi/zzzzz_ic_lock_power_reboot.png b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/drawable-hdpi/zzzzz_ic_lock_power_reboot.png
+new file mode 100755
+index 0000000000000000000000000000000000000000..4d5e9ae681b8f7741a653d6ab1a0670929de1796
+GIT binary patch
+literal 1757
+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
+
+literal 0
+HcmV?d00001
+
+diff --git a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/drawable-xhdpi/zzzzz_ic_lock_power_reboot.png b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/drawable-xhdpi/zzzzz_ic_lock_power_reboot.png
+new file mode 100755
+index 0000000000000000000000000000000000000000..4d5e9ae681b8f7741a653d6ab1a0670929de1796
+GIT binary patch
+literal 1757
+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
+
+literal 0
+HcmV?d00001
+
+diff --git a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-de/strings.xml b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-de/strings.xml
+index dd53e49..27effc7 100644
+--- a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-de/strings.xml
++++ b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-de/strings.xml
+@@ -342,4 +342,10 @@
+     <string name="usb_cd_installer_notification_title">"Als Installationsprogramm angeschlossen"</string>
+     <string name="aerr_application_permission">\"<xliff:g id="err_ap_name">%1$s</xliff:g>\" konnte nicht auf Ihr <xliff:g id="permission_name">%2$s</xliff:g> zugreifen, Berechtigung erteilen?</string>
+     <string name="denied_required_permission">Berechtigungen verweigert. Sie können sie unter Einstellungen &gt; Apps ändern.</string>
++    <!-- hetian add start for PP-7 add power reboot -->
++    <string name="zzzzz_global_action_power_reboot">rebooten</string>
++    <string name="reboot_confirm_gt" product="default">"Telefon wird neu gestartet."</string>
++    <string name="reboot_confirm_gt_title" product="default">"Rebooten"</string>
++    <!-- hetian add end for PP-7 add power reboot -->
++
+ </resources>
+diff --git a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-es-rUS/strings.xml b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-es-rUS/strings.xml
+index f78c0cf..88ebf7d 100644
+--- a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-es-rUS/strings.xml
++++ b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-es-rUS/strings.xml
+@@ -338,4 +338,10 @@
+     <string name="usb_cd_installer_notification_title">"Conectado como un instalador"</string>
+     <string name="aerr_application_permission">\"<xliff:g id="err_ap_name">%1$s</xliff:g>\" no pudo acceder a su <xliff:g id="permission_name">%2$s</xliff:g>, ¿activar permiso?</string>
+     <string name="denied_required_permission">Permisos rechazados. Puede cambiarlos en Configuración &gt; Aplicaciones.</string>
++    <!-- hetian add start for PP-7 add power reboot -->
++    <!-- label for item that power reboot in phone options dialog -->
++    <string name="zzzzz_global_action_power_reboot">Reiniciar</string>
++    <string name="reboot_confirm_gt" product="default">"El teléfono se reiniciará."</string>
++    <string name="reboot_confirm_gt_title" product="default">"Reiniciar"</string>
++    <!-- hetian add end for PP-7 add power reboot -->
+ </resources>
+diff --git a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-es/strings.xml b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-es/strings.xml
+index fb313fa..f8e6631 100644
+--- a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-es/strings.xml
++++ b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-es/strings.xml
+@@ -340,4 +340,10 @@
+     <string name="usb_cd_installer_notification_title">"Conectado como instalador"</string>
+     <string name="aerr_application_permission">\"<xliff:g id="err_ap_name">%1$s</xliff:g>\" no pudo acceder a su <xliff:g id="permission_name">%2$s</xliff:g>. ¿Desea conceder permiso?</string>
+     <string name="denied_required_permission">Permisos denegados. Puede cambiarlos en Configuración &gt; Aplicaciones.</string>
++    <!--hetian add start for PP-7 add power reboot -->
++    <!-- label for item that power reboot in phone options dialog -->
++    <string name="zzzzz_global_action_power_reboot">Reiniciar</string>
++    <string name="reboot_confirm_gt" product="default">"El teléfono se reiniciará."</string>
++    <string name="reboot_confirm_gt_title" product="default">"Reiniciar"</string>
++    <!--hetian add end for PP-7 add power reboot -->
+ </resources>
+diff --git a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-fr/strings.xml b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-fr/strings.xml
+index 61762be..1039916 100644
+--- a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-fr/strings.xml
++++ b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-fr/strings.xml
+@@ -338,4 +338,9 @@
+     <string name="usb_cd_installer_notification_title">"Connecté en tant que programme d\'installation"</string>
+     <string name="aerr_application_permission">"\"<xliff:g id="err_ap_name">%1$s</xliff:g>\" n'a pas pu accéder à votre <xliff:g id="permission_name">%2$s</xliff:g>, délivrer la permission?"</string>
+     <string name="denied_required_permission">Permissions refusées. Vous pouvez les modifier dans Paramètres &gt; Applications.</string>
++    <!-- hetian add start for PP-7 add power reboot -->
++    <string name="zzzzz_global_action_power_reboot">redémarrage</string>
++    <string name="reboot_confirm_gt" product="default">"Le téléphone va redémarrage."</string>
++    <string name="reboot_confirm_gt_title" product="default">"Redémarrage"</string>
++    <!-- hetian add end for PP-7 add power reboot -->
+ </resources>
+diff --git a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-pt-rPT/strings.xml b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-pt-rPT/strings.xml
+index e094341..b701f8b 100644
+--- a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-pt-rPT/strings.xml
++++ b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-pt-rPT/strings.xml
+@@ -297,4 +297,9 @@
+     <string name="usb_cd_installer_notification_title">"Ligado como um instalador"</string>
+     <string name="aerr_application_permission">\"<xliff:g id="err_ap_name">%1$s</xliff:g>\" não conseguiu aceder ao seu <xliff:g id="permission_name">%2$s</xliff:g>. Ativar a permissão?</string>
+     <string name="denied_required_permission">Permissões negadas. Pode alterar em Definições &gt; Aplicações.</string>
++    <!--hetian add start for PP-7 add power reboot -->
++    <string name="zzzzz_global_action_power_reboot">Reiniciar</string>
++    <string name="reboot_confirm_gt" product="default">"Telefone irá reiniciar."</string>
++    <string name="reboot_confirm_gt_title" product="default">"Reiniciar"</string>
++    <!--hetian add end for PP-7 add power reboot -->
+ </resources>
+diff --git a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-zh-rCN/strings.xml b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-zh-rCN/strings.xml
+old mode 100644
+new mode 100755
+index 6013a78..5868381
+--- a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-zh-rCN/strings.xml
++++ b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-zh-rCN/strings.xml
+@@ -345,4 +345,9 @@
+ 
+     <!-- Runtime Permission -->
+     <string name="denied_required_permission">"权限被拒绝。您可以依次选择 \"设置\"&gt;\"应用\" 来更改权限。"</string>
++    <!--hetian add start for PP-7 add power reboot -->
++    <string name="zzzzz_global_action_power_reboot">重启</string>
++    <string name="reboot_confirm_gt" product="default">"手机将会重启"</string>
++    <string name="reboot_confirm_gt_title" product="default">"重启"</string>
++    <!--hetian add end for PP-7 add power reboot -->
+ </resources>
+diff --git a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-zh-rHK/strings.xml b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-zh-rHK/strings.xml
+index 1d98075..eba3018 100644
+--- a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-zh-rHK/strings.xml
++++ b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-zh-rHK/strings.xml
+@@ -278,4 +278,9 @@
+     <string name="usb_cd_installer_notification_title">"已作為安裝程式連線"</string>
+     <string name="aerr_application_permission">\"<xliff:g id="err_ap_name">%1$s</xliff:g>\"未能讀取<xliff:g id="permission_name">%2$s</xliff:g>，允許使用權嗎？</string>
+     <string name="denied_required_permission">"權限被拒絕。你可以於\"設定\" &gt; \"應用程式\" 中更改權限。"</string>
++    <!--hetian add start for PP-7 add power reboot -->
++    <string name="zzzzz_global_action_power_reboot">重啟</string>
++    <string name="reboot_confirm_gt" product="default">"您的手機將會重新啟動。"</string>
++    <string name="reboot_confirm_gt_title" product="default">"重啟"</string>
++    <!--hetian add end for PP-7 add power reboot -->
+ </resources>
+diff --git a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-zh-rTW/strings.xml b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-zh-rTW/strings.xml
+old mode 100644
+new mode 100755
+index a574751..e7eec7d
+--- a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-zh-rTW/strings.xml
++++ b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values-zh-rTW/strings.xml
+@@ -358,4 +358,9 @@
+     <string name="usb_cd_installer_notification_title">"已視為安裝程式連線"</string>
+     <string name="aerr_application_permission">\"<xliff:g id="err_ap_name">%1$s</xliff:g>\"無法存取您的<xliff:g id="permission_name">%2$s</xliff:g>，開放許可?</string>
+     <string name="denied_required_permission">"權限不足。請從 \"設定\" &gt; \"應用程式\" 修改權限。"</string>
++    <!--hetian add start for PP-7 add power reboot -->
++    <string name="zzzzz_global_action_power_reboot">重啟</string>
++    <string name="reboot_confirm_gt" product="default">"您的手機將會重新啟動。"</string>
++    <string name="reboot_confirm_gt_title" product="default">"重啟"</string>
++    <!--hetian add end for PP-7 add power reboot -->
+ </resources>
+diff --git a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values/public.xml b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values/public.xml
+index ca0728e..cf2d86e 100755
+--- a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values/public.xml
++++ b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values/public.xml
+@@ -259,4 +259,7 @@
+ 
+   <!-- Runtime Permission -->
+   <public type="string" name="denied_required_permission" id="0x08050124"/>
++  <!--hetian add zzzzz_ic_lock_power_reboot-->
++  <public type="drawable" name="zzzzz_ic_lock_power_reboot"/>
++
+ </resources>
+diff --git a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values/strings.xml b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values/strings.xml
+index 1062c9b..805d679 100644
+--- a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values/strings.xml
++++ b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values/strings.xml
+@@ -519,5 +519,10 @@
+     <string name="permlab_bindTerminal">Bind OMAPI Terminal</string>
+     <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
+     <string name="permdesc_bindTerminal">An app with this permission can bind to the System\'s OMAPI Terminals. Only SmartcardService should use it.</string>
++    <!-- hetian add start for PP-7 add power reboot -->
++    <string name="zzzzz_global_action_power_reboot">Reboot</string>
++    <string name="reboot_confirm_gt" product="default">"The phone will reboot."</string>
++    <string name="reboot_confirm_gt_title" product="default">"Reboot"</string>
++    <!-- hetian add end for PP-7 add power reboot -->
+ 
+ </resources>
+diff --git a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values/symbols.xml b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values/symbols.xml
+index 334f8d4..f6c4352 100755
+--- a/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values/symbols.xml
++++ b/alps/vendor/mediatek/proprietary/frameworks/base/res/res/values/symbols.xml
+@@ -1048,4 +1048,9 @@
+   <java-symbol type="drawable" name="float_window_stick_clicked" />
+   <java-symbol type="drawable" name="float_window_stick" />
+   <java-symbol type="id" name="activityStick" />
++  <!-- hetian add start for PP-7 add power reboot -->
++  <java-symbol type="string" name="zzzzz_global_action_power_reboot" />
++  <java-symbol type="string" name="reboot_confirm_gt" />
++  <java-symbol type="string" name="reboot_confirm_gt_title" />
++  <!-- hetian add end for PP-7 add power reboot -->
+ </resources>
+-- 
+2.3.7
+

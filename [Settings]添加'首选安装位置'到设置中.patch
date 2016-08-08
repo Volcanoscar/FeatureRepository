@@ -1,0 +1,42 @@
+From 20b92f84aaa9064f19cd88e7c509f7dd888871f1 Mon Sep 17 00:00:00 2001
+From: tianyunfei <tianyunfei@hkzechin.com>
+Date: Mon, 31 Aug 2015 20:57:29 +0800
+Subject: [PATCH] =?UTF-8?q?[BLU][Settings]=E6=B7=BB=E5=8A=A0'=E9=A6=96?=
+ =?UTF-8?q?=E9=80=89=E5=AE=89=E8=A3=85=E4=BD=8D=E7=BD=AE'=E5=88=B0?=
+ =?UTF-8?q?=E8=AE=BE=E7=BD=AE=E4=B8=AD?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../src/com/android/providers/settings/DatabaseHelper.java            | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+ mode change 100644 => 100755 alps/frameworks/base/packages/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java
+
+diff --git a/alps/frameworks/base/packages/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java b/alps/frameworks/base/packages/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java
+old mode 100644
+new mode 100755
+index be664ae..8b4fa0c
+--- a/alps/frameworks/base/packages/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java
++++ b/alps/frameworks/base/packages/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java
+@@ -790,7 +790,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
+             try {
+                 stmt = db.compileStatement("INSERT INTO system(name,value)"
+                         + " VALUES(?,?);");
+-                loadSetting(stmt, Global.SET_INSTALL_LOCATION, 0);
++                loadSetting(stmt, Global.SET_INSTALL_LOCATION, 1);//tianyunfei 20150831 modify from 0 to 1 for show INSTALL_LOCATION in settings
+                 loadSetting(stmt, Global.DEFAULT_INSTALL_LOCATION,
+                         PackageHelper.APP_INSTALL_AUTO);
+                 db.setTransactionSuccessful();
+@@ -2704,7 +2704,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
+             loadIntegerSetting(stmt, Settings.Global.DOCK_AUDIO_MEDIA_ENABLED,
+                     R.integer.def_dock_audio_media_enabled);
+ 
+-            loadSetting(stmt, Settings.Global.SET_INSTALL_LOCATION, 0);
++            loadSetting(stmt, Settings.Global.SET_INSTALL_LOCATION, 1);//tianyunfei 20150831 modify from 0 to 1 for show INSTALL_LOCATION in settings
+             loadSetting(stmt, Settings.Global.DEFAULT_INSTALL_LOCATION,
+                     PackageHelper.APP_INSTALL_AUTO);
+ 
+-- 
+2.3.7
+
