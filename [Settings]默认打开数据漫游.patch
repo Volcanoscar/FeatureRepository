@@ -1,0 +1,56 @@
+From 814e60287f8f8da9834dcc5983ecb132c56c32fd Mon Sep 17 00:00:00 2001
+From: moduanke <moduanke@hkzechin.com>
+Date: Fri, 27 May 2016 20:34:44 +0800
+Subject: [PATCH] =?UTF-8?q?[Bmobile][Settings]=E9=BB=98=E8=AE=A4=E6=89=93?=
+ =?UTF-8?q?=E5=BC=80=E6=95=B0=E6=8D=AE=E6=BC=AB=E6=B8=B8?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ alps/device/zechin/zechin6735m_35_m0/system.prop                      | 4 ++++
+ .../base/telephony/java/android/telephony/SubscriptionManager.java    | 2 +-
+ .../opt/tedongle/src/java/android/tedongle/SubscriptionManager.java   | 2 +-
+ 3 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/alps/device/zechin/zechin6735m_35_m0/system.prop b/alps/device/zechin/zechin6735m_35_m0/system.prop
+index 6bb9cbb..252eb38 100755
+--- a/alps/device/zechin/zechin6735m_35_m0/system.prop
++++ b/alps/device/zechin/zechin6735m_35_m0/system.prop
+@@ -74,3 +74,7 @@ persist.sys.timezone = America/Mexico_City
+ 
+ #Moka add for for Shutdown anims
+ ro.operator.optr=CUST
++
++#Moka add for data
++ro.com.android.dataroaming=true
++ro.com.android.dataroaming2=true
+diff --git a/alps/frameworks/base/telephony/java/android/telephony/SubscriptionManager.java b/alps/frameworks/base/telephony/java/android/telephony/SubscriptionManager.java
+index 25e5083..bc3d170 100644
+--- a/alps/frameworks/base/telephony/java/android/telephony/SubscriptionManager.java
++++ b/alps/frameworks/base/telephony/java/android/telephony/SubscriptionManager.java
+@@ -291,7 +291,7 @@ public class SubscriptionManager {
+     public static final int DATA_ROAMING_DISABLE = 0;
+ 
+     /** @hide */
+-    public static final int DATA_ROAMING_DEFAULT = DATA_ROAMING_DISABLE;
++    public static final int DATA_ROAMING_DEFAULT = DATA_ROAMING_ENABLE;//DATA_ROAMING_DISABLE;
+ 
+     /**
+      * TelephonyProvider column name for the MCC associated with a SIM.
+diff --git a/alps/vendor/mediatek/proprietary/frameworks/opt/tedongle/src/java/android/tedongle/SubscriptionManager.java b/alps/vendor/mediatek/proprietary/frameworks/opt/tedongle/src/java/android/tedongle/SubscriptionManager.java
+index 5c7af62..ce7505c 100644
+--- a/alps/vendor/mediatek/proprietary/frameworks/opt/tedongle/src/java/android/tedongle/SubscriptionManager.java
++++ b/alps/vendor/mediatek/proprietary/frameworks/opt/tedongle/src/java/android/tedongle/SubscriptionManager.java
+@@ -234,7 +234,7 @@ public class SubscriptionManager {
+     public static final int DATA_ROAMING_DISABLE = 0;
+ 
+     /** @hide */
+-    public static final int DATA_ROAMING_DEFAULT = DATA_ROAMING_DISABLE;
++    public static final int DATA_ROAMING_DEFAULT = DATA_ROAMING_ENABLE;//DATA_ROAMING_DISABLE;
+ 
+     /**
+      * TelephonyProvider column name for the MCC associated with a SIM.
+-- 
+2.3.7
+
