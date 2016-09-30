@@ -1,0 +1,101 @@
+From 971d6545faec64e4f0e1309bdc8a3b53b6cf45d9 Mon Sep 17 00:00:00 2001
+From: lilinyu <lilinyu@hkzechin.com>
+Date: Sun, 12 Jun 2016 17:40:56 +0800
+Subject: [PATCH] =?UTF-8?q?[Rivo][Telephone]=E6=B7=BB=E5=8A=A02G/3G(auto)?=
+ =?UTF-8?q?=E9=80=89=E9=A1=B9?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ alps/packages/services/Telephony/res/values/strings.xml  | 11 +++++++----
+ .../src/com/android/phone/MobileNetworkSettings.java     | 16 ++++++++++++++--
+ 2 files changed, 21 insertions(+), 6 deletions(-)
+ mode change 100644 => 100755 alps/packages/services/Telephony/res/values/strings.xml
+ mode change 100644 => 100755 alps/packages/services/Telephony/src/com/android/phone/MobileNetworkSettings.java
+
+diff --git a/alps/packages/services/Telephony/res/values/strings.xml b/alps/packages/services/Telephony/res/values/strings.xml
+old mode 100644
+new mode 100755
+index 52e4961..ce0923f
+--- a/alps/packages/services/Telephony/res/values/strings.xml
++++ b/alps/packages/services/Telephony/res/values/strings.xml
+@@ -584,7 +584,8 @@
+ 
+     <string name="network_lte">LTE (recommended)</string>
+     <string name="network_4G">4G (recommended)</string>
+-    <string name="network_3G" translatable="false">3G</string>
++	<string name="network_3G" translatable="false">2G/3G(auto)</string>
++    <string name="network_3G_only" translatable="false">3G</string>
+     <string name="network_2G" translatable="false">2G</string>
+     <string name="network_1x" translatable="false">1x</string>
+     <string name="network_global">Global</string>
+@@ -603,12 +604,14 @@
+     </string-array>
+ 
+     <string-array name="enabled_networks_except_lte_choices" translatable="false">
+-        <item>@string/network_3G</item>
++		<item>@string/network_3G</item>
++        <item>@string/network_3G_only</item>
+         <item>@string/network_2G</item>
+     </string-array>
+     <string-array name="enabled_networks_except_lte_values" translatable="false">
+-        <item>"0"</item>
+-        <item>"1"</item>
++        <item>"2"</item>
++		<item>"0"</item>
++        <item>"1"</item>	
+     </string-array>
+ 
+     <string-array name="enabled_networks_except_gsm_lte_choices" translatable="false">
+diff --git a/alps/packages/services/Telephony/src/com/android/phone/MobileNetworkSettings.java b/alps/packages/services/Telephony/src/com/android/phone/MobileNetworkSettings.java
+old mode 100644
+new mode 100755
+index 0a37579..d6463ee
+--- a/alps/packages/services/Telephony/src/com/android/phone/MobileNetworkSettings.java
++++ b/alps/packages/services/Telephony/src/com/android/phone/MobileNetworkSettings.java
+@@ -946,6 +946,7 @@ public class MobileNetworkSettings extends PreferenceActivity implements
+                 switch (buttonNetworkMode) {
+                     case Phone.NT_MODE_WCDMA_PREF:
+                     case Phone.NT_MODE_GSM_ONLY:
++					case Phone.NT_MODE_WCDMA_ONLY:
+                     case Phone.NT_MODE_LTE_GSM_WCDMA:
+                     case Phone.NT_MODE_LTE_CDMA_EVDO_GSM_WCDMA:
+                     case Phone.NT_MODE_CDMA:
+@@ -1173,12 +1174,23 @@ public class MobileNetworkSettings extends PreferenceActivity implements
+         }
+         // @}
+         switch (NetworkMode) {
+-            case Phone.NT_MODE_WCDMA_ONLY:
++            //case Phone.NT_MODE_WCDMA_ONLY:
+             case Phone.NT_MODE_GSM_UMTS:
+             case Phone.NT_MODE_WCDMA_PREF:
+                 if (!mIsGlobalCdma) {
+                     mButtonEnabledNetworks.setValue(
+                             Integer.toString(Phone.NT_MODE_WCDMA_PREF));
++                    mButtonEnabledNetworks.setSummary(R.string.network_3G_only);
++                } else {
++                    mButtonEnabledNetworks.setValue(
++                            Integer.toString(Phone.NT_MODE_LTE_CDMA_EVDO_GSM_WCDMA));
++                    mButtonEnabledNetworks.setSummary(R.string.network_global);
++                }
++                break;
++			case Phone.NT_MODE_WCDMA_ONLY:
++                if (!mIsGlobalCdma) {
++                    mButtonEnabledNetworks.setValue(
++                            Integer.toString(Phone.NT_MODE_WCDMA_PREF));
+                     mButtonEnabledNetworks.setSummary(R.string.network_3G);
+                 } else {
+                     mButtonEnabledNetworks.setValue(
+@@ -1235,7 +1247,7 @@ public class MobileNetworkSettings extends PreferenceActivity implements
+             case Phone.NT_MODE_GLOBAL:
+                 mButtonEnabledNetworks.setValue(
+                         Integer.toString(Phone.NT_MODE_CDMA));
+-                mButtonEnabledNetworks.setSummary(R.string.network_3G);
++                mButtonEnabledNetworks.setSummary(R.string.network_3G_only);
+                 break;
+             case Phone.NT_MODE_CDMA_NO_EVDO:
+                 mButtonEnabledNetworks.setValue(
+-- 
+2.3.7
+

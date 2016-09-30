@@ -1,0 +1,251 @@
+From 9f951042b9b19d8bb4e5042b45c57bc8c1208a1f Mon Sep 17 00:00:00 2001
+From: chehongbin <chehongbin@hkzechin.com>
+Date: Tue, 30 Aug 2016 09:55:25 +0800
+Subject: [PATCH] =?UTF-8?q?[HTM][Launcher3]=E4=BF=AE=E6=94=B9=E6=A1=8C?=
+ =?UTF-8?q?=E9=9D=A2=EF=BC=8C=E7=AC=A6=E5=90=88GMS=E8=A6=81=E6=B1=82?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../packages/apps/Launcher3/res/values/strings.xml |   1 +
+ .../Launcher3/res/xml/default_workspace_4x4.xml    | 206 +++++++++++++++++++--
+ 2 files changed, 187 insertions(+), 20 deletions(-)
+
+diff --git a/alps/packages/apps/Launcher3/res/values/strings.xml b/alps/packages/apps/Launcher3/res/values/strings.xml
+index fefadef..05dbedd 100755
+--- a/alps/packages/apps/Launcher3/res/values/strings.xml
++++ b/alps/packages/apps/Launcher3/res/values/strings.xml
+@@ -260,5 +260,6 @@
+ 
+     <!-- Accessibility confirmation for widget resize. -->
+     <string name="widget_resized">Widget resized to width <xliff:g id="number" example="2">%1$s</xliff:g> height <xliff:g id="number" example="1">%2$s</xliff:g></string>
++    <string name="folder_google">Google</string><!--chb 20160322 add for Google folder-->
+ 
+ </resources>
+diff --git a/alps/packages/apps/Launcher3/res/xml/default_workspace_4x4.xml b/alps/packages/apps/Launcher3/res/xml/default_workspace_4x4.xml
+index 060a1f8..46b4318 100755
+--- a/alps/packages/apps/Launcher3/res/xml/default_workspace_4x4.xml
++++ b/alps/packages/apps/Launcher3/res/xml/default_workspace_4x4.xml
+@@ -16,32 +16,198 @@
+ 
+ <favorites xmlns:launcher="http://schemas.android.com/apk/res-auto/com.android.launcher3">
+ 
+-    <!-- Hotseat -->
+-    <include launcher:workspace="@xml/dw_phone_hotseat" />
+-
+-    <!-- Bottom row -->
+-    <resolve
++    <!-- Left screen [1] -->
++    <appwidget
++        launcher:packageName="com.android.deskclock"
++        launcher:className="com.android.alarmclock.DigitalAppWidgetProvider"
+         launcher:screen="0"
+         launcher:x="0"
+-        launcher:y="3" >
+-        <favorite launcher:uri="#Intent;action=android.intent.action.MAIN;category=android.intent.category.APP_EMAIL;end" />
+-        <favorite launcher:uri="mailto:" />
+-    </resolve>
+-
+-    <resolve
++        launcher:y="0"
++        launcher:spanX="4"
++        launcher:spanY="2" />
++    <favorite
++        launcher:packageName="com.android.gallery3d"
++        launcher:className="com.android.camera.CameraLauncher"
++        launcher:screen="0"
++        launcher:x="0"
++        launcher:y="3" />
++        
++   <!-- <favorite
++        launcher:packageName="com.android.gallery3d"
++        launcher:className="com.android.gallery3d.app.Gallery"
+         launcher:screen="0"
+         launcher:x="1"
+-        launcher:y="3" >
+-        <favorite launcher:uri="#Intent;action=android.intent.action.MAIN;category=android.intent.category.APP_GALLERY;end" />
+-        <favorite launcher:uri="#Intent;type=images/*;end" />
+-    </resolve>
++        launcher:y="3" /> -->
++       
++    <favorite
++        launcher:packageName="com.android.settings"
++        launcher:className="com.android.settings.Settings"
++        launcher:screen="0"
++        launcher:x="1"
++        launcher:y="3" />
++
++    <favorite
++        launcher:packageName="com.android.vending"
++        launcher:className="com.android.vending.AssetBrowserActivity"
++        launcher:screen="0"
++        launcher:x="2"
++        launcher:y="3" /> 
++        
+ 
+-    <resolve
++    <folder
++	launcher:title="@string/folder_google"
++        launcher:screen="0"
++	launcher:x="3"
++	launcher:y="3" >
++		<favorite 
++			launcher:packageName="com.google.android.googlequicksearchbox"
++			launcher:className="com.google.android.googlequicksearchbox.SearchActivity"
++			launcher:screen="1"
++			launcher:x="0"
++			launcher:y="0"
++			launcher:spanX="1"
++			launcher:spanY="1" />
++		<favorite 
++			launcher:packageName="com.android.chrome"
++			launcher:className="com.google.android.apps.chrome.Main"
++			launcher:screen="1"
++			launcher:x="1"
++			launcher:y="0"
++			launcher:spanX="1"
++			launcher:spanY="1" />
++			<favorite 
++			launcher:packageName="com.google.android.gm"
++			launcher:className="com.google.android.gm.ConversationListActivityGmail"
++			launcher:screen="1"
++			launcher:x="2"
++			launcher:y="0"
++			launcher:spanX="1"
++			launcher:spanY="1" />
++			<favorite 
++			launcher:packageName="com.google.android.apps.maps"
++			launcher:className="com.google.android.maps.MapsActivity"
++			launcher:screen="1"
++			launcher:x="3"
++			launcher:y="0"
++			launcher:spanX="1"
++			launcher:spanY="1" />
++			
++			<favorite 
++			launcher:packageName="com.google.android.youtube"
++			launcher:className="com.google.android.youtube.app.honeycomb.Shell$HomeActivity"
++			launcher:screen="1"
++			launcher:x="0"
++			launcher:y="1"
++			launcher:spanX="1"
++			launcher:spanY="1" />
++            
++			<favorite 
++			launcher:packageName="com.google.android.apps.docs"
++			launcher:className="com.google.android.apps.docs.app.NewMainProxyActivity"
++			launcher:screen="1"
++			launcher:x="1"
++			launcher:y="1"
++			launcher:spanX="1"
++			launcher:spanY="1" />
++			
++			<favorite 
++			launcher:packageName="com.google.android.music"
++			launcher:className="com.android.music.activitymanagement.TopLevelActivity"
++			launcher:screen="1"
++			launcher:x="2"
++			launcher:y="1"
++			launcher:spanX="1"
++			launcher:spanY="1" />
++			<favorite 
++			launcher:packageName="com.google.android.videos"
++			launcher:className="com.google.android.youtube.videos.EntryPoint"
++			launcher:screen="1"
++			launcher:x="3"
++			launcher:y="1"
++			launcher:spanX="1"
++			launcher:spanY="1" />
++			
++			<favorite 
++			launcher:packageName="com.google.android.talk"
++			launcher:className="com.google.android.talk.SigningInActivity"
++			launcher:screen="1"
++			launcher:x="0"
++			launcher:y="2"
++			launcher:spanX="1"
++			launcher:spanY="1" />
++			
++			<favorite 
++			launcher:packageName="com.google.android.apps.photos"
++			launcher:className="com.google.android.apps.photos.home.HomeActivity"
++			launcher:screen="1"
++			launcher:x="1"
++			launcher:y="2"
++			launcher:spanX="1"
++			launcher:spanY="1" />	
++    </folder>        
++    
++    <!-- Left screen [1] -->
++ <!--   <appwidget
++		        launcher:packageName="com.android.settings"
++		        launcher:className="com.android.settings.widget.SettingsAppWidgetProvider"
++		        launcher:screen="1"
++		        launcher:x="0"
++		        launcher:y="0"
++		        launcher:spanX="4"
++		        launcher:spanY="1" />
++		<favorite
++        launcher:packageName="com.zechin.agfindlove"
++        launcher:className="com.zechin.agfindlove.FindLoveActivity"
++        launcher:screen="1"
++        launcher:x="0"
++        launcher:y="1" />
++-->
++    <!--For GTS ALPS01562185. Add the PlayStore.apk shorcut on workspace while this application is existed.-->
++<!--    <favorite
++        launcher:packageName="com.android.vending"
++        launcher:className="com.android.vending.AssetBrowserActivity"
+         launcher:screen="0"
+         launcher:x="3"
+-        launcher:y="3" >
+-        <favorite launcher:uri="#Intent;action=android.intent.action.MAIN;category=android.intent.category.APP_MARKET;end" />
+-        <favorite launcher:uri="market://details?id=com.android.launcher" />
+-    </resolve>
++        launcher:y="3" /> -->
++
++    <!-- Far-right screen [4] -->
+ 
++    <!-- Hotseat (We use the screen as the position of the item in the hotseat) -->
++    <favorite
++        launcher:packageName="com.android.dialer"
++        launcher:className="com.android.dialer.DialtactsActivity"
++        launcher:container="-101"
++        launcher:screen="0"
++        launcher:x="0"
++        launcher:y="0" />
++    <favorite
++        launcher:packageName="com.android.contacts"
++        launcher:className="com.android.contacts.activities.PeopleActivity"
++        launcher:container="-101"
++        launcher:screen="1"
++        launcher:x="1"
++        launcher:y="0" />
++    <favorite
++        launcher:packageName="com.android.mms"
++        launcher:className="com.android.mms.ui.BootActivity"
++        launcher:container="-101"
++        launcher:screen="3"
++        launcher:x="3"
++        launcher:y="0" />
++<!--
++    <favorite
++        launcher:packageName="com.android.vending"
++        launcher:className="com.android.vending.AssetBrowserActivity"
++        launcher:container="-101"
++        launcher:screen="4"
++        launcher:x="4"
++        launcher:y="0" /> -->
++  
++    <favorite
++        launcher:packageName="com.android.chrome"
++        launcher:className="com.google.android.apps.chrome.Main"
++        launcher:container="-101"
++        launcher:screen="4"
++        launcher:x="4"
++        launcher:y="0" />
+ </favorites>
+-- 
+2.3.7
+

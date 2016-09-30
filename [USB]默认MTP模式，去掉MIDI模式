@@ -1,0 +1,155 @@
+From 75870655e96e1ecc0de9c2e08a34b62f4778cbcd Mon Sep 17 00:00:00 2001
+From: liangjianqiu <liangjianqiu@hkzechin.com>
+Date: Fri, 25 Mar 2016 17:11:07 +0800
+Subject: [PATCH] =?UTF-8?q?[Azumi][USB]=E9=BB=98=E8=AE=A4MTP=E6=A8=A1?=
+ =?UTF-8?q?=E5=BC=8F=EF=BC=8C=E5=8E=BB=E6=8E=89MIDI=E6=A8=A1=E5=BC=8F?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../com/android/server/usb/UsbDeviceManager.java   | 27 +++++++++++++++++++++-
+ .../android/settings/deviceinfo/UsbBackend.java    |  9 ++++++++
+ .../deviceinfo/UsbModeChooserActivity.java         |  7 +++---
+ 3 files changed, 39 insertions(+), 4 deletions(-)
+ mode change 100644 => 100755 alps/frameworks/base/services/usb/java/com/android/server/usb/UsbDeviceManager.java
+ mode change 100644 => 100755 alps/packages/apps/Settings/src/com/android/settings/deviceinfo/UsbBackend.java
+ mode change 100644 => 100755 alps/packages/apps/Settings/src/com/android/settings/deviceinfo/UsbModeChooserActivity.java
+
+diff --git a/alps/frameworks/base/services/usb/java/com/android/server/usb/UsbDeviceManager.java b/alps/frameworks/base/services/usb/java/com/android/server/usb/UsbDeviceManager.java
+old mode 100644
+new mode 100755
+index 4a7183a..c90e9b3
+--- a/alps/frameworks/base/services/usb/java/com/android/server/usb/UsbDeviceManager.java
++++ b/alps/frameworks/base/services/usb/java/com/android/server/usb/UsbDeviceManager.java
+@@ -1057,7 +1057,13 @@ public class UsbDeviceManager {
+             intent.putExtra(UsbManager.USB_CONFIGURED, mConfigured);
+             intent.putExtra(UsbManager.USB_DATA_UNLOCKED, isUsbTransferAllowed() && mUsbDataUnlocked);
+             intent.putExtra("USB_HW_DISCONNECTED", mHwDisconnected);
+-
++//jianqiu modify 20160234 mtp default begin
++            int mDefaultSupport = Settings.System.getInt(mContentResolver, "usb_storage_default_mtp",1);
++	     if(mDefaultSupport == 1){
++		 	intent.putExtra(UsbManager.USB_DATA_UNLOCKED, true);
++			intent.putExtra(UsbManager.USB_FUNCTION_MTP, true);
++	     	}
++//jianqiu modify 20160234 mtp default end
+             if (mCurrentFunctions != null) {
+                 String[] functions = mCurrentFunctions.split(",");
+                 for (int i = 0; i < functions.length; i++) {
+@@ -1143,7 +1149,24 @@ public class UsbDeviceManager {
+                         updateCurrentAccessory();
+                     } else if (!mConnected) {
+                         // restore defaults when USB is disconnected
++                        //setEnabledFunctions(null, false);  //jianqiu modify 20160234 mtp default
++                         int mChargeselect = Settings.System.getInt(mContentResolver, "usb_storage_charge",0);
++			    int mDefaultSupport = Settings.System.getInt(mContentResolver, "usb_storage_default_mtp",1);
++                        if(mChargeselect == 0){
++				if(mDefaultSupport == 1){
++                            setCurrentFunctions("mtp");
++                            setEnabledFunctions("mtp", false);
++			       setUsbDataUnlocked(true);					
++					}else{
++                            setCurrentFunctions(mCurrentFunctions);
++                            setEnabledFunctions(mCurrentFunctions, false);
++			       setUsbDataUnlocked(true);
++					}
++                        }else{
++                        setCurrentFunctions(null);
+                         setEnabledFunctions(null, false);
++			   setUsbDataUnlocked(false);
++                        }
+                     }
+                     if (mBootCompleted) {
+                         updateUsbStateBroadcast();
+@@ -1196,6 +1219,8 @@ public class UsbDeviceManager {
+                     updateUsbFunctions();
+                     break;
+                 case MSG_BOOT_COMPLETED:
++		      Settings.System.putInt(mContext.getContentResolver(), "usb_storage_default_mtp",1);
++		      updateState("HWDISCONNECTED");
+                     mBootCompleted = true;
+                     if (mCurrentAccessory != null) {
+                         getCurrentSettings().accessoryAttached(mCurrentAccessory);
+diff --git a/alps/packages/apps/Settings/src/com/android/settings/deviceinfo/UsbBackend.java b/alps/packages/apps/Settings/src/com/android/settings/deviceinfo/UsbBackend.java
+old mode 100644
+new mode 100755
+index 5e4eb4f..6b86d10
+--- a/alps/packages/apps/Settings/src/com/android/settings/deviceinfo/UsbBackend.java
++++ b/alps/packages/apps/Settings/src/com/android/settings/deviceinfo/UsbBackend.java
+@@ -23,6 +23,8 @@ import android.hardware.usb.UsbPort;
+ import android.hardware.usb.UsbPortStatus;
+ import android.os.SystemProperties;
+ import android.os.UserManager;
++import android.util.Log;
++import android.provider.Settings;
+ 
+ public class UsbBackend {
+ 
+@@ -62,8 +64,10 @@ public class UsbBackend {
+     private UsbPortStatus mPortStatus;
+ 
+     private boolean mIsUnlocked;
++    Context mContext;
+ 
+     public UsbBackend(Context context) {
++	 mContext = context;
+         Intent intent = context.registerReceiver(null,
+                 new IntentFilter(UsbManager.ACTION_USB_STATE));
+         mIsUnlocked = intent.getBooleanExtra(UsbManager.USB_DATA_UNLOCKED, false);
+@@ -118,10 +122,12 @@ public class UsbBackend {
+     private void setUsbFunction(int mode) {
+         switch (mode) {
+             case MODE_DATA_MTP:
++		  Settings.System.putInt(mContext.getContentResolver(), "usb_storage_charge",0); //jianqiu modify 20160234 mtp default 
+                 mUsbManager.setCurrentFunction(UsbManager.USB_FUNCTION_MTP);
+                 mUsbManager.setUsbDataUnlocked(true);
+                 break;
+             case MODE_DATA_PTP:
++		  Settings.System.putInt(mContext.getContentResolver(), "usb_storage_charge",0); //jianqiu modify 20160234 mtp default 
+                 mUsbManager.setCurrentFunction(UsbManager.USB_FUNCTION_PTP);
+                 mUsbManager.setUsbDataUnlocked(true);
+                 break;
+@@ -140,6 +146,7 @@ public class UsbBackend {
+                 break;
+             /// M: @}
+             default:
++                Settings.System.putInt(mContext.getContentResolver(), "usb_storage_charge",1); //jianqiu modify 20160234 mtp default 
+                 mUsbManager.setCurrentFunction(null);
+                 mUsbManager.setUsbDataUnlocked(false);
+                 break;
+@@ -157,6 +164,8 @@ public class UsbBackend {
+                     ? UsbPort.DATA_ROLE_HOST : UsbPort.DATA_ROLE_DEVICE;
+             mUsbManager.setPortRoles(mPort, powerRole, dataRole);
+         }
++       //jianqiu modify 20160234 mtp default 
++	 Settings.System.putInt(mContext.getContentResolver(), "usb_storage_default_mtp",0);
+         setUsbFunction(mode & MODE_DATA_MASK);
+     }
+ 
+diff --git a/alps/packages/apps/Settings/src/com/android/settings/deviceinfo/UsbModeChooserActivity.java b/alps/packages/apps/Settings/src/com/android/settings/deviceinfo/UsbModeChooserActivity.java
+old mode 100644
+new mode 100755
+index 7fad036..8079b19
+--- a/alps/packages/apps/Settings/src/com/android/settings/deviceinfo/UsbModeChooserActivity.java
++++ b/alps/packages/apps/Settings/src/com/android/settings/deviceinfo/UsbModeChooserActivity.java
+@@ -37,12 +37,13 @@ import com.android.settings.R;
+  */
+ public class UsbModeChooserActivity extends Activity {
+ 
++//jianqiu modify 20160324 default mtp mode,delete midi
+     public static final int[] DEFAULT_MODES = {
+-        UsbBackend.MODE_POWER_SINK | UsbBackend.MODE_DATA_NONE,
+-        UsbBackend.MODE_POWER_SOURCE | UsbBackend.MODE_DATA_NONE,
+         UsbBackend.MODE_POWER_SINK | UsbBackend.MODE_DATA_MTP,
+         UsbBackend.MODE_POWER_SINK | UsbBackend.MODE_DATA_PTP,
+-        UsbBackend.MODE_POWER_SINK | UsbBackend.MODE_DATA_MIDI,
++        UsbBackend.MODE_POWER_SINK | UsbBackend.MODE_DATA_NONE,
++        UsbBackend.MODE_POWER_SOURCE | UsbBackend.MODE_DATA_NONE,        
++        //UsbBackend.MODE_POWER_SINK | UsbBackend.MODE_DATA_MIDI,
+         /// M: Add for Built-in CD-ROM and USB Mass Storage @{
+         UsbBackend.MODE_POWER_SINK | UsbBackend.MODE_DATA_MASS_STORAGE,
+         UsbBackend.MODE_POWER_SINK | UsbBackend.MODE_DATA_BICR
+-- 
+2.3.7
+

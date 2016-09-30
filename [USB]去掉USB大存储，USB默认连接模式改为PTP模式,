@@ -1,0 +1,66 @@
+From 545b8d59cba4e881f39c350bf20478129aacfc1c Mon Sep 17 00:00:00 2001
+From: chehongbin <chehongbin@hkzechin.com>
+Date: Tue, 30 Aug 2016 11:24:42 +0800
+Subject: [PATCH] =?UTF-8?q?[HTM][USB]=E5=8E=BB=E6=8E=89USB=E5=A4=A7?=
+ =?UTF-8?q?=E5=AD=98=E5=82=A8=EF=BC=8CUSB=E9=BB=98=E8=AE=A4=E8=BF=9E?=
+ =?UTF-8?q?=E6=8E=A5=E6=A8=A1=E5=BC=8F=E6=94=B9=E4=B8=BAPTP=E6=A8=A1?=
+ =?UTF-8?q?=E5=BC=8F,=E6=96=B9=E4=BE=BFGMS=E8=AE=A4=E8=AF=81?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ alps/device/zechin/zechin6580_we_m/ProjectConfig.mk                  | 2 +-
+ alps/device/zechin/zechin6580_we_m/system.prop                       | 3 ++-
+ .../services/usb/java/com/android/server/usb/UsbDeviceManager.java   | 5 ++++-
+ 3 files changed, 7 insertions(+), 3 deletions(-)
+ mode change 100644 => 100755 alps/frameworks/base/services/usb/java/com/android/server/usb/UsbDeviceManager.java
+
+diff --git a/alps/device/zechin/zechin6580_we_m/ProjectConfig.mk b/alps/device/zechin/zechin6580_we_m/ProjectConfig.mk
+index 7d65762..1b683be 100755
+--- a/alps/device/zechin/zechin6580_we_m/ProjectConfig.mk
++++ b/alps/device/zechin/zechin6580_we_m/ProjectConfig.mk
+@@ -421,7 +421,7 @@ MTK_LTE_DC_SUPPORT = no
+ MTK_LTE_SUPPORT = no
+ MTK_M4U_SUPPORT = yes
+ MTK_MAGICONFERENCE_SUPPORT = no
+-MTK_MASS_STORAGE = yes
++MTK_MASS_STORAGE = no
+ MTK_MATV_ANALOG_SUPPORT = no
+ MTK_MATV_SERIAL_IF_SUPPORT = no
+ MTK_MAV_PLAYBACK_SUPPORT = yes
+diff --git a/alps/device/zechin/zechin6580_we_m/system.prop b/alps/device/zechin/zechin6580_we_m/system.prop
+index 385e2f8..18a55b8 100755
+--- a/alps/device/zechin/zechin6580_we_m/system.prop
++++ b/alps/device/zechin/zechin6580_we_m/system.prop
+@@ -36,7 +36,8 @@ ro.sys.usb.mtp.whql.enable=0
+ # Power off opt in IPO
+ sys.ipo.pwrdncap=2
+ 
+-ro.sys.usb.storage.type=mtp,mass_storage
++#ro.sys.usb.storage.type=mtp,mass_storage
++ro.sys.usb.storage.type=mtp
+ 
+ # USB BICR function
+ ro.sys.usb.bicr=yes
+diff --git a/alps/frameworks/base/services/usb/java/com/android/server/usb/UsbDeviceManager.java b/alps/frameworks/base/services/usb/java/com/android/server/usb/UsbDeviceManager.java
+old mode 100644
+new mode 100755
+index 4a7183a..f4f62f6
+--- a/alps/frameworks/base/services/usb/java/com/android/server/usb/UsbDeviceManager.java
++++ b/alps/frameworks/base/services/usb/java/com/android/server/usb/UsbDeviceManager.java
+@@ -1143,7 +1143,10 @@ public class UsbDeviceManager {
+                         updateCurrentAccessory();
+                     } else if (!mConnected) {
+                         // restore defaults when USB is disconnected
+-                        setEnabledFunctions(null, false);
++			//chb modify for cts test
++                        //setEnabledFunctions(null, false);
++			setEnabledFunctions(UsbManager.USB_FUNCTION_PTP, false);
++			setUsbDataUnlocked(true);
+                     }
+                     if (mBootCompleted) {
+                         updateUsbStateBroadcast();
+-- 
+2.3.7
+

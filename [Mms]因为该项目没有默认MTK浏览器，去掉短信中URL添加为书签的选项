@@ -1,0 +1,245 @@
+From aa2b7e321c4e168a691fdb9d6c11111c94e2113a Mon Sep 17 00:00:00 2001
+From: tianyunfei <tianyunfei@hkzechin.com>
+Date: Mon, 18 Apr 2016 20:45:21 +0800
+Subject: [PATCH] =?UTF-8?q?[Rivo][Mms]=E5=9B=A0=E4=B8=BA=E8=AF=A5=E9=A1=B9?=
+ =?UTF-8?q?=E7=9B=AE=E6=B2=A1=E6=9C=89=E9=BB=98=E8=AE=A4MTK=E6=B5=8F?=
+ =?UTF-8?q?=E8=A7=88=E5=99=A8=EF=BC=8C=E5=8E=BB=E6=8E=89=E7=9F=AD=E4=BF=A1?=
+ =?UTF-8?q?=E4=B8=ADURL=E6=B7=BB=E5=8A=A0=E4=B8=BA=E4=B9=A6=E7=AD=BE?=
+ =?UTF-8?q?=E7=9A=84=E9=80=89=E9=A1=B9?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../Mms/src/com/android/mms/ui/ComposeMessageActivity.java | 12 ++++++++----
+ .../apps/Mms/src/com/android/mms/ui/MmsPlayerActivity.java | 14 +++++++++-----
+ .../apps/Mms/src/com/android/mms/ui/SlideView.java         | 14 +++++++++-----
+ .../com/mediatek/mms/folder/ui/FolderModeSmsViewer.java    | 13 +++++++++----
+ .../Mms/src/com/mediatek/simmessage/ManageSimMessages.java | 13 +++++++++----
+ 5 files changed, 44 insertions(+), 22 deletions(-)
+ mode change 100644 => 100755 alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/SlideView.java
+ mode change 100644 => 100755 alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/mms/folder/ui/FolderModeSmsViewer.java
+
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/ComposeMessageActivity.java b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/ComposeMessageActivity.java
+index 8ecc148..4fccc76 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/ComposeMessageActivity.java
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/ComposeMessageActivity.java
+@@ -1611,10 +1611,12 @@ public class ComposeMessageActivity extends Activity
+                 knownPrefix = false;
+ 
+                 /// M: Code analyze 022, Add bookmark. Maybe exist multi URL address @{
+-                if (msgItem.isSms() && mURLs.size() <= 0) {
++                //tianyunfei 20160418 remove menu add to bookmark begin
++                /*if (msgItem.isSms() && mURLs.size() <= 0) {
+                     menu.add(0, MENU_ADD_TO_BOOKMARK, 0, R.string.menu_add_to_bookmark)
+                     .setOnMenuItemClickListener(l);
+-                }
++                }*/
++                //tianyunfei 20160418 remove menu add to bookmark end
+                 /// @}
+ 
+                 /// M: Code analyze 022, Add bookmark. fix bug ALPS00783237 @{
+@@ -2167,7 +2169,8 @@ public class ComposeMessageActivity extends Activity
+                 }
+ 
+                 /// M: Code analyze 022, Add bookmark. Maybe exist multi URL addresses. @{
+-                case MENU_ADD_TO_BOOKMARK: {
++                //tianyunfei 20160418 remove menu add to bookmark begin
++                /*case MENU_ADD_TO_BOOKMARK: {
+                     if (mURLs.size() == 1) {
+                         Browser.saveBookmark(ComposeMessageActivity.this, null, mURLs.get(0));
+                     } else if (mURLs.size() > 1) {
+@@ -2186,7 +2189,8 @@ public class ComposeMessageActivity extends Activity
+                             .show();
+                     }
+                     return true;
+-                }
++                }*/
++                //tianyunfei 20160418 remove menu add to bookmark end
+ 
+                 /// M: Code analyze 007, Get information from Sub or save message to Sub. @{
+                 case MENU_SAVE_MESSAGE_TO_SUB: {
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/MmsPlayerActivity.java b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/MmsPlayerActivity.java
+index bda7a79..f48a2ab 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/MmsPlayerActivity.java
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/MmsPlayerActivity.java
+@@ -710,8 +710,8 @@ public class MmsPlayerActivity extends Activity
+                     (ClipboardManager) MmsPlayerActivity.this.getSystemService(mContext.CLIPBOARD_SERVICE);
+                 clip.setText(mCopyText);
+                 return true;
+-
+-            case MENU_ADD_TO_BOOKMARK:
++            //tianyunfei 20160418 remove menu add to bookmark begin
++            /*case MENU_ADD_TO_BOOKMARK:
+                 if (mURLs.size() == 1) {
+                     Browser.saveBookmark(mContext, null, mURLs.get(0));
+                 } else if (mURLs.size() > 1) {
+@@ -729,7 +729,8 @@ public class MmsPlayerActivity extends Activity
+                             })
+                         .show();
+                 }
+-                return true;
++                return true;*/
++                //tianyunfei 20160418 remove menu add to bookmark end
+ 
+             case MENU_ADD_ADDRESS_TO_CONTACTS:
+                 Intent mAddContactIntent = item.getIntent();
+@@ -837,14 +838,17 @@ public class MmsPlayerActivity extends Activity
+                     }
+                 }
+                 addToContacts = !isNumberInContacts(uriString);
+-            } else {
++            }
++            //tianyunfei 20160418 remove menu add to bookmark begin
++            /*else {
+                 //add URL to book mark
+                 if (mURLs.size() <= 0) {
+                     menu.add(0, MENU_ADD_TO_BOOKMARK, 0, R.string.menu_add_to_bookmark)
+                     .setOnMenuItemClickListener(l);
+                 }
+                 mURLs.add(uriString);
+-            }
++            }*/
++            //tianyunfei 20160418 remove menu add to bookmark end
+             if (addToContacts) {
+                 Intent intent = ConversationList.createAddContactIntent(uriString);
+                 String addContactString = mContext.getString(
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/SlideView.java b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/SlideView.java
+old mode 100644
+new mode 100755
+index dada776..7075085
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/SlideView.java
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/android/mms/ui/SlideView.java
+@@ -858,8 +858,8 @@ public class SlideView extends AbsoluteLayout implements
+                         (ClipboardManager) getContext().getSystemService(mContext.CLIPBOARD_SERVICE);
+                     clip.setText(mTextView.getText());
+                     return true;
+-
+-                case MENU_ADD_TO_BOOKMARK:
++                //tianyunfei 20160418 remove menu add to bookmark begin
++                /*case MENU_ADD_TO_BOOKMARK:
+                     if (mURLs.size() == 1) {
+                         Browser.saveBookmark(mContext, null, mURLs.get(0));
+                     } else if (mURLs.size() > 1) {
+@@ -878,7 +878,8 @@ public class SlideView extends AbsoluteLayout implements
+                             .show();
+                     }
+ 
+-                    return true;
++                    return true;*/
++                //tianyunfei 20160418 remove menu add to bookmark end
+                 case MENU_ADD_ADDRESS_TO_CONTACTS:
+                     Intent mAddContactIntent = item.getIntent();
+                     MessageUtils.addNumberOrEmailtoContact(mAddContactIntent.getStringExtra(ContactsContract.Intents.Insert.PHONE),
+@@ -974,14 +975,17 @@ public class SlideView extends AbsoluteLayout implements
+                     }
+                 }
+                 addToContacts = !isNumberInContacts(uriString);
+-            } else {
++            } 
++            //tianyunfei 20160418 remove menu add to bookmark begin
++            /*else {
+                 /// M: add URL to book mark
+                 if (mURLs.size() <= 0) {
+                     menu.add(0, MENU_ADD_TO_BOOKMARK, 0, R.string.menu_add_to_bookmark)
+                     .setOnMenuItemClickListener(l);
+                 }
+                 mURLs.add(uriString);
+-            }
++            }*/
++            //tianyunfei 20160418 remove menu add to bookmark end
+             if (addToContacts) {
+                 //Intent intent = ConversationList.createAddContactIntent(uriString);
+                 Intent intent = new Intent(Intent.ACTION_INSERT, Contacts.CONTENT_URI);
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/mms/folder/ui/FolderModeSmsViewer.java b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/mms/folder/ui/FolderModeSmsViewer.java
+old mode 100644
+new mode 100755
+index 4a06f7c..47bfea4
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/mms/folder/ui/FolderModeSmsViewer.java
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/mms/folder/ui/FolderModeSmsViewer.java
+@@ -715,7 +715,8 @@ public class FolderModeSmsViewer extends Activity implements Contact.UpdateListe
+                           .setCancelable(true)
+                           .show();
+                   return true;
+-              case MENU_ADD_TO_BOOKMARK:
++              //tianyunfei 20160418 remove menu add to bookmark begin
++              /*case MENU_ADD_TO_BOOKMARK:
+                   if (mURLs.size() == 1) {
+                       Browser.saveBookmark(FolderModeSmsViewer.this, null, mURLs.get(0));
+                   } else if (mURLs.size() > 1) {
+@@ -734,7 +735,8 @@ public class FolderModeSmsViewer extends Activity implements Contact.UpdateListe
+                               })
+                           .show();
+                   }
+-                  return true;
++                  return true;*/
++               //tianyunfei 20160418 remove menu add to bookmark end
+                case MENU_SELECT_TEXT:
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(FolderModeSmsViewer.this);
+                    LayoutInflater factory = LayoutInflater.from(dialog.getContext());
+@@ -1163,14 +1165,17 @@ public class FolderModeSmsViewer extends Activity implements Contact.UpdateListe
+                     }
+                 }
+                 addToContacts = !isNumberInContacts(uriString);
+-            } else {
++            } 
++            //tianyunfei 20160418 remove menu add to bookmark begin
++            /*else {
+                 //add URL to book mark
+                 if (mURLs.size() <= 0) {
+                     menu.add(0, MENU_ADD_TO_BOOKMARK, 0, R.string.menu_add_to_bookmark)
+                     .setOnMenuItemClickListener(l);
+                 }
+                 mURLs.add(uriString);
+-            }
++            }*/
++            //tianyunfei 20160418 remove menu add to bookmark end
+             if (addToContacts) {
+                 Intent intent = ConversationList.createAddContactIntent(uriString);
+                 //Intent intent = new Intent(Intent.ACTION_INSERT, Contacts.CONTENT_URI);
+diff --git a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/simmessage/ManageSimMessages.java b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/simmessage/ManageSimMessages.java
+index 90ad55c..ffcc523 100755
+--- a/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/simmessage/ManageSimMessages.java
++++ b/alps/vendor/mediatek/proprietary/packages/apps/Mms/src/com/mediatek/simmessage/ManageSimMessages.java
+@@ -547,7 +547,8 @@ public class ManageSimMessages extends Activity
+         case MENU_REPLY:
+             replyMessage(cursor);
+             return true;
+-        case MENU_ADD_TO_BOOKMARK:
++        //tianyunfei 20160418 remove menu add to bookmark begin
++        /*case MENU_ADD_TO_BOOKMARK:
+             if (mURLs.size() == 1) {
+                 Browser.saveBookmark(ManageSimMessages.this, null, mURLs.get(0));
+             } else if (mURLs.size() > 1) {
+@@ -564,7 +565,8 @@ public class ManageSimMessages extends Activity
+                         })
+                     .show();
+             }
+-            return true;
++            return true;*/
++        //tianyunfei 20160418 remove menu add to bookmark end
+ 
+         case MENU_ADD_CONTACT:
+             String number = cursor.getString(cursor.getColumnIndexOrThrow("address"));
+@@ -913,13 +915,16 @@ public class ManageSimMessages extends Activity
+             } else if ("tel".equalsIgnoreCase(prefix)) {
+                 addToContacts = !isNumberInContacts(uriString);
+                 MmsLog.d(TAG, "addCallAndContactMenuItems  addToContacts2 = " + addToContacts);
+-            } else {
++            } 
++            //tianyunfei 20160418 remove menu add to bookmark begin
++            /*else {
+                 //add URL to book mark
+                 if (mURLs.size() <= 0) {
+                     menu.add(0, MENU_ADD_TO_BOOKMARK, 0, R.string.menu_add_to_bookmark);
+                 }
+                 mURLs.add(uriString);
+-            }
++            }*/
++            //tianyunfei 20160418 remove menu add to bookmark end
+             if (addToContacts) {
+                  Intent intent = ConversationList.createAddContactIntent(uriString);
+                 //Intent intent = new Intent(Intent.ACTION_INSERT, Contacts.CONTENT_URI);
+-- 
+2.3.7
+

@@ -1,0 +1,75 @@
+From 3ae7fbdc2ed706c5ac237740d08a042fa40306ee Mon Sep 17 00:00:00 2001
+From: chehongbin <chehongbin@hkzechin.com>
+Date: Mon, 26 Sep 2016 14:02:59 +0800
+Subject: [PATCH] =?UTF-8?q?[HTM][Setting][NN-5]=E4=B8=8D=E5=B8=A6=E5=85=89?=
+ =?UTF-8?q?=E6=84=9F=EF=BC=8C=E5=8E=BB=E6=8E=89=E8=AE=BE=E7=BD=AE=E6=98=BE?=
+ =?UTF-8?q?=E7=A4=BA=E9=87=8C=E7=9A=84=E8=87=AA=E5=8A=A8=E8=B0=83=E8=8A=82?=
+ =?UTF-8?q?=E4=BA=AE=E5=BA=A6=E5=8A=9F=E8=83=BD(=E8=A1=A5=E5=85=85)?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ alps/device/zechin/zechin6580_we_m/ProjectConfig.mk                  | 3 ++-
+ .../apps/Settings/src/com/android/settings/DisplaySettings.java      | 5 +++++
+ .../src/com/android/settings/widget/SettingsAppWidgetProvider.java   | 4 +++-
+ 3 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/alps/device/zechin/zechin6580_we_m/ProjectConfig.mk b/alps/device/zechin/zechin6580_we_m/ProjectConfig.mk
+index 8e88a0c..ff12ee7 100755
+--- a/alps/device/zechin/zechin6580_we_m/ProjectConfig.mk
++++ b/alps/device/zechin/zechin6580_we_m/ProjectConfig.mk
+@@ -32,7 +32,8 @@ CUSTOM_HAL_SUB_BACKUP_LENS =
+ CUSTOM_HAL_SUB_IMGSENSOR = gc2355_mipi_raw sp0a09_mipi_raw gc030Amipi_raw
+ CUSTOM_HAL_SUB_LENS = dummy_lens
+ CUSTOM_KERNEL_ACCELEROMETER = yes
+-CUSTOM_KERNEL_ALSPS = yes
++#chb modiffy for HTM 4065
++#CUSTOM_KERNEL_ALSPS = yes
+ CUSTOM_KERNEL_BAROMETER =
+ CUSTOM_KERNEL_BATTERY = battery
+ CUSTOM_KERNEL_CAMERA = camera
+diff --git a/alps/packages/apps/Settings/src/com/android/settings/DisplaySettings.java b/alps/packages/apps/Settings/src/com/android/settings/DisplaySettings.java
+index 446aa56..e9a2eb7 100644
+--- a/alps/packages/apps/Settings/src/com/android/settings/DisplaySettings.java
++++ b/alps/packages/apps/Settings/src/com/android/settings/DisplaySettings.java
+@@ -133,6 +133,8 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
+         if (isAutomaticBrightnessAvailable(getResources())) {
+             mAutoBrightnessPreference = (SwitchPreference) findPreference(KEY_AUTO_BRIGHTNESS);
+             mAutoBrightnessPreference.setOnPreferenceChangeListener(this);
++            //mDisplaySettingsExt.removePreference(findPreference(KEY_AUTO_BRIGHTNESS));//chb 20160601  remove auto_brightness for without light sensor
++            removePreference(KEY_AUTO_BRIGHTNESS);
+         } else {
+             removePreference(KEY_AUTO_BRIGHTNESS);
+         }
+@@ -504,9 +506,12 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
+                             || FeatureOption.MTK_GMO_RAM_OPTIMIZE) {
+                         result.add(KEY_SCREEN_SAVER);
+                     }
++                    //chb remove auto_brightness for without light sensor
++                    /*
+                     if (!isAutomaticBrightnessAvailable(context.getResources())) {
+                         result.add(KEY_AUTO_BRIGHTNESS);
+                     }
++                    */
+                     if (!isLiftToWakeAvailable(context)) {
+                         result.add(KEY_LIFT_TO_WAKE);
+                     }
+diff --git a/alps/packages/apps/Settings/src/com/android/settings/widget/SettingsAppWidgetProvider.java b/alps/packages/apps/Settings/src/com/android/settings/widget/SettingsAppWidgetProvider.java
+index 1f5aaf4..3eb223e 100644
+--- a/alps/packages/apps/Settings/src/com/android/settings/widget/SettingsAppWidgetProvider.java
++++ b/alps/packages/apps/Settings/src/com/android/settings/widget/SettingsAppWidgetProvider.java
+@@ -902,7 +902,9 @@ public class SettingsAppWidgetProvider extends AppWidgetProvider {
+                 } else if (brightness < pm.getMaximumScreenBrightnessSetting()) {
+                     brightness = pm.getMaximumScreenBrightnessSetting();
+                 } else {
+-                    brightnessMode = Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC;
++                     //chb mdofiy for remove auto bright 
++                    //brightnessMode = Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC;
++                    brightnessMode = Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL;
+                     brightness = pm.getMinimumScreenBrightnessSetting();
+                 }
+ 
+-- 
+2.3.7
+
